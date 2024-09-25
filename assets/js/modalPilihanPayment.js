@@ -31,7 +31,7 @@ document
         method: "POST",
         body: new FormData(document.getElementById("paymentMethodForm")),
       })
-        .then((response) => response.json())
+        .then((response) => response.json()) // Ubah ke JSON langsung
         .then((data) => {
           console.log(data);
           if (data.success) {
@@ -40,36 +40,43 @@ document
 
             // Setelah mendapatkan createdTime, hit generateQris.php dengan metode POST dan query string
             fetch(`../config/generateQris.php?createdTime=${createdTime}`, {
-                method: "POST", 
-                headers: {
-                  Accept: "application/json",
-                },
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+              },
+            })
+              .then((response) => {
+                // Cek apakah response berhasil
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json(); // Mengambil respons sebagai JSON
               })
-                .then((response) => response.text())  // Mengambil respons sebagai teks mentah
-                .then((responseText) => {
-                  console.log("Response Text: ", responseText); // Cek respons mentah dari server
-                  
-                  // Lalu coba parse ke JSON
-                  try {
-                    const responseData = JSON.parse(responseText);
-                    console.log("Parsed JSON: ", responseData);
-              
-                    if (responseData.transactionDetail && responseData.transactionDetail.transactionQrId) {
-                      var rawQrData = responseData.transactionDetail.rawQr;
-                      $("#qrisModalBody").html(
-                        '<img src="data:image/png;base64,' + rawQrData + '" alt="QRIS Code">'
-                      );
-                      $("#qrisModal").modal("show");
-                    } else {
-                      alert("Transaction QR ID tidak ditemukan dalam response.");
-                    }
-                  } catch (e) {
-                    alert("Error parsing JSON: " + e.message);
-                  }
-                })
-                .catch((error) => console.error("Error fetching QRIS data:", error));
-              
-              
+              .then((responseData) => {
+                console.log("Parsed JSON: ", responseData);
+
+                // Cek apakah transactionDetail dan transactionQrId ada
+                if (
+                  responseData.transactionDetail &&
+                  responseData.transactionDetail.transactionQrId
+                ) {
+                  var rawQrData = responseData.transactionDetail.rawQr;
+                  $("#qrisModalBody").html(
+                    '<img src="data:image/png;base64,' +
+                      rawQrData +
+                      '" alt="QRIS Code">'
+                  );
+                  $("#qrisModal").modal("show");
+                } else {
+                  alert("Transaction QR ID tidak ditemukan dalam response.");
+                }
+              })
+              .catch((error) => {
+                console.error("Error fetching QRIS data:", error);
+                alert(
+                  "Terjadi kesalahan saat mengambil data QRIS: " + error.message
+                );
+              });
           } else {
             alert("Terjadi kesalahan dalam membuat tagihan.");
           }
@@ -103,7 +110,6 @@ document
       alert("Metode pembayaran tidak valid.");
     }
   });
-
 
 // Function to copy VA number to clipboard
 function copyVaNumber() {
