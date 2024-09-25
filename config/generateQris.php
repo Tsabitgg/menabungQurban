@@ -10,22 +10,29 @@ $pass = 'Smartpay1ct';
 $mysqli = new mysqli($host, $user, $pass, $db);
 
 if ($mysqli->connect_error) {
-    die('Koneksi gagal: ' . $mysqli->connect_error);
+    // Mengembalikan error dalam format JSON
+    echo json_encode(['status' => false, 'message' => 'Koneksi gagal: ' . $mysqli->connect_error]);
+    exit();
 }
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json"); // Set header response ke JSON
 
 // Ambil billing_id dari request parameter
 $createdTime = isset($_GET['createdTime']) ? intval($_GET['createdTime']) : 0;
 
 if ($createdTime <= 0) {
-    die('createdTime tidak valid');
+    echo json_encode(['status' => false, 'message' => 'createdTime tidak valid']);
+    exit();
 }
 
-$query = "SELECT * FROM tagihan WHERE created_time = $createdTime";
-$result = $mysqli->query($query);
+$query = "SELECT * FROM tagihan WHERE created_time = ?";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param('i', $createdTime);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -49,9 +56,7 @@ if ($result->num_rows > 0) {
     $ch = curl_init($url);
 
     // Data yang akan dikirimkan dengan request POST
-    $postData = json_encode([
-        'token' => $jwtToken
-    ]);
+    $postData = json_encode(['token' => $jwtToken]);
 
     // Set CURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -65,43 +70,41 @@ if ($result->num_rows > 0) {
     // Eksekusi CURL dan ambil response
     $response = curl_exec($ch);
 
-    // Tampilkan response
-    echo $response;
-
     // Check for CURL errors
     if ($response === false) {
-        echo 'CURL Error: ' . curl_error($ch);
-    } else {
-        // Decode response untuk mengambil transactionQrId
-        $responseData = json_decode($response, true);
-        
-        // Periksa apakah 'transactionDetail' dan 'transactionQrId' ada dalam response
-        if (isset($responseData['transactionDetail']['transactionQrId'])) {
-            $transactionQrId = $responseData['transactionDetail']['transactionQrId'];
+        echo json_encode(['status' => false, 'message' => 'CURL Error: ' . curl_error($ch)]);
+        exit();
+    }
 
-            // Update database dengan transactionQrId
-            $updateQuery = "UPDATE tagihan SET transaksi_qr_id = ? WHERE created_time = ?";
-            $stmt = $mysqli->prepare($updateQuery);
-            $stmt->bind_param('si', $transactionQrId, $createdTime);
+    // Decode response untuk mengambil transactionQrId
+    $responseData = json_decode($response, true);
 
-            // Execute statement untuk menyimpan perubahan
-            if ($stmt->execute()) {
-                echo '';
-            } else {
-                echo 'Gagal menyimpan Transaction QR ID: ' . $stmt->error;
-            }
+    // Periksa apakah 'transactionDetail' dan 'transactionQrId' ada dalam response
+    if (isset($responseData['transactionDetail']['transactionQrId'])) {
+        $transactionQrId = $responseData['transactionDetail']['transactionQrId'];
 
-            $stmt->close();
+        // Update database dengan transactionQrId
+        $updateQuery = "UPDATE tagihan SET transaksi_qr_id = ? WHERE created_time = ?";
+        $stmt = $mysqli->prepare($updateQuery);
+        $stmt->bind_param('si', $transactionQrId, $createdTime);
+
+        // Execute statement untuk menyimpan perubahan
+        if ($stmt->execute()) {
+            echo json_encode(['status' => true, 'message' => 'Transaction QR ID berhasil disimpan']);
         } else {
-            echo 'Transaction QR ID tidak ditemukan dalam response.';
+            echo json_encode(['status' => false, 'message' => 'Gagal menyimpan Transaction QR ID: ' . $stmt->error]);
         }
+
+        $stmt->close();
+    } else {
+        echo json_encode(['status' => false, 'message' => 'Transaction QR ID tidak ditemukan dalam response.']);
     }
 
     // Tutup CURL
     curl_close($ch);
 
 } else {
-    echo "Data tidak ditemukan";
+    echo json_encode(['status' => false, 'message' => 'Data tidak ditemukan']);
 }
 
 // Tutup koneksi
