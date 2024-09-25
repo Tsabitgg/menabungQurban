@@ -31,7 +31,7 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
     $data = [
-        "accountNo" => "5010118824",
+        "accountNo" => 5010118824,
         "amount" => $row['jumlah_setoran'],
         "mitraCustomerId" => "LAZIZMU KOTA SEMARANG INFAQ511164",
         "transactionId" => $row['created_time'],
