@@ -10,19 +10,18 @@ $pass = 'Smartpay1ct';
 $mysqli = new mysqli($host, $user, $pass, $db);
 
 if ($mysqli->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Koneksi gagal: ' . $mysqli->connect_error]));
+    die('Koneksi gagal: ' . $mysqli->connect_error);
 }
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
-header('Content-Type: application/json'); // Set header untuk JSON
 
 // Ambil billing_id dari request parameter
 $createdTime = isset($_GET['createdTime']) ? intval($_GET['createdTime']) : 0;
 
 if ($createdTime <= 0) {
-    die(json_encode(['success' => false, 'message' => 'createdTime tidak valid']));
+    die('createdTime tidak valid');
 }
 
 $query = "SELECT * FROM tagihan WHERE created_time = $createdTime";
@@ -50,7 +49,9 @@ if ($result->num_rows > 0) {
     $ch = curl_init($url);
 
     // Data yang akan dikirimkan dengan request POST
-    $postData = json_encode(['token' => $jwtToken]);
+    $postData = json_encode([
+        'token' => $jwtToken
+    ]);
 
     // Set CURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -64,40 +65,43 @@ if ($result->num_rows > 0) {
     // Eksekusi CURL dan ambil response
     $response = curl_exec($ch);
 
+    // Tampilkan response
+    echo $response;
+
     // Check for CURL errors
     if ($response === false) {
-        die(json_encode(['success' => false, 'message' => 'CURL Error: ' . curl_error($ch)]));
-    }
-
-    // Decode response untuk mengambil transactionQrId
-    $responseData = json_decode($response, true);
-    
-    // Periksa apakah 'transactionDetail' dan 'transactionQrId' ada dalam response
-    if (isset($responseData['transactionDetail']['transactionQrId'])) {
-        $transactionQrId = $responseData['transactionDetail']['transactionQrId'];
-
-        // Update database dengan transactionQrId
-        $updateQuery = "UPDATE tagihan SET transaksi_qr_id = ? WHERE created_time = ?";
-        $stmt = $mysqli->prepare($updateQuery);
-        $stmt->bind_param('si', $transactionQrId, $createdTime);
-
-        // Execute statement untuk menyimpan perubahan
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Transaction QR ID saved successfully.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Gagal menyimpan Transaction QR ID: ' . $stmt->error]);
-        }
-
-        $stmt->close();
+        echo 'CURL Error: ' . curl_error($ch);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Transaction QR ID tidak ditemukan dalam response.']);
+        // Decode response untuk mengambil transactionQrId
+        $responseData = json_decode($response, true);
+        
+        // Periksa apakah 'transactionDetail' dan 'transactionQrId' ada dalam response
+        if (isset($responseData['transactionDetail']['transactionQrId'])) {
+            $transactionQrId = $responseData['transactionDetail']['transactionQrId'];
+
+            // Update database dengan transactionQrId
+            $updateQuery = "UPDATE tagihan SET transaksi_qr_id = ? WHERE created_time = ?";
+            $stmt = $mysqli->prepare($updateQuery);
+            $stmt->bind_param('si', $transactionQrId, $createdTime);
+
+            // Execute statement untuk menyimpan perubahan
+            if ($stmt->execute()) {
+                echo '';
+            } else {
+                echo 'Gagal menyimpan Transaction QR ID: ' . $stmt->error;
+            }
+
+            $stmt->close();
+        } else {
+            echo 'Transaction QR ID tidak ditemukan dalam response.';
+        }
     }
 
     // Tutup CURL
     curl_close($ch);
 
 } else {
-    echo json_encode(['success' => false, 'message' => 'Data tidak ditemukan']);
+    echo "Data tidak ditemukan";
 }
 
 // Tutup koneksi
