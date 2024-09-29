@@ -89,17 +89,25 @@ if (isset($_SESSION['status']) && isset($_SESSION['message'])) {
     </div>
     <div class="w-1/2 pl-4">
      <form method="POST" action="../config/prosesRegister.php">
-      <div class="mb-4">
-       <label class="block text-gray-700 font-semibold mb-2">Nama Pekurban <span class="text-red-500">*</span></label>
-       <div class="flex space-x-4">
-        <input class="w-1/2 p-2 border border-gray-300 rounded" placeholder="Contoh: Cerah Rupian" type="text" name="nama" required/>
-        <input class="w-1/2 p-2 border border-gray-300 rounded" placeholder="Bin Andang" type="text" name="nama_orang_tua" required/>
-       </div>
-       <div class="flex space-x-4 mt-2">
-        <span class="w-1/2 text-gray-500 text-sm">Nama Lengkap</span>
-        <span class="w-1/2 text-gray-500 text-sm">Bin/Binti Nama Orang Tua</span>
-       </div>
-      </div>
+     <div class="mb-4">
+  <label class="block text-gray-700 font-semibold mb-2">Nama Pekurban <span class="text-red-500">*</span></label>
+  <div class="flex space-x-4">
+    <input class="w-1/2 p-2 border border-gray-300 rounded" placeholder="Contoh: Cerah Rupian" type="text" name="nama" required/>
+    <input class="w-1/2 p-2 border border-gray-300 rounded" placeholder="Contoh: Bin Andang" type="text" name="nama_orang_tua" required/>
+  </div>
+  <div class="flex space-x-4 mt-2">
+    <span class="w-1/2 text-gray-500 text-sm">Nama Lengkap</span>
+    <span class="w-1/2 text-gray-500 text-sm">Bin/Binti Nama Orang Tua</span>
+  </div>
+</div>
+
+<div class="mb-4">
+  <input class="w-full p-2 border border-gray-300 rounded" placeholder="Alamat" type="text" name="alamat" required/>
+  <div class="mt-2">
+    <span class="text-gray-500 text-sm">Alamat</span>
+  </div>
+</div>
+
       <div class="mb-4">
        <label class="block text-gray-700 font-semibold mb-2">Wilayah Tebar Indonesia</label>
        <div class="space-y-2">

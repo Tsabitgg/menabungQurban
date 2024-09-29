@@ -5,6 +5,7 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = $_POST['nama'];
     $nama_orang_tua = $_POST['nama_orang_tua'];
+    $alamat = $_POST['alamat'];
     $qurban_id = $_POST['qurban_id'];
     $nomor_hp = $_POST['nomor_hp'];
 
@@ -25,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = substr($nomor_hp, -6);
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    $sqlUser = "INSERT INTO users (nama, nama_orang_tua, nomor_hp, password) VALUES (?, ?, ?, ?)";
+    $sqlUser = "INSERT INTO users (nama, nama_orang_tua, alamat, nomor_hp, password) VALUES (?, ?, ?, ?, ?)";
     $stmtUser = $conn->prepare($sqlUser);
-    $stmtUser->bind_param("ssss", $nama, $nama_orang_tua, $nomor_hp, $hashed_password);
+    $stmtUser->bind_param("sssss", $nama, $nama_orang_tua, $alamat, $nomor_hp, $hashed_password);
 
     if ($stmtUser->execute()) {
         $user_id = $stmtUser->insert_id;
