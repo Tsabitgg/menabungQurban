@@ -28,7 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $sqlUser = "INSERT INTO users (nama, nama_orang_tua, alamat, nomor_hp, password, saldo) VALUES (?, ?, ?, ?, ?, ?)";
     $stmtUser = $conn->prepare($sqlUser);
-    $stmtUser->bind_param("sssssi", $nama, $nama_orang_tua, $alamat, $nomor_hp, $hashed_password, 0);
+    
+    $saldo = "0.00";
+    
+    $stmtUser->bind_param("ssssss", $nama, $nama_orang_tua, $alamat, $nomor_hp, $hashed_password, $saldo);
 
     if ($stmtUser->execute()) {
         $user_id = $stmtUser->insert_id;
