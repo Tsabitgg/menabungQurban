@@ -26,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = substr($nomor_hp, -6);
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    $sqlUser = "INSERT INTO users (nama, nama_orang_tua, alamat, nomor_hp, password) VALUES (?, ?, ?, ?, ?)";
+    $sqlUser = "INSERT INTO users (nama, nama_orang_tua, alamat, nomor_hp, password, saldo) VALUES (?, ?, ?, ?, ?, ?)";
     $stmtUser = $conn->prepare($sqlUser);
-    $stmtUser->bind_param("sssss", $nama, $nama_orang_tua, $alamat, $nomor_hp, $hashed_password);
+    $stmtUser->bind_param("sssssi", $nama, $nama_orang_tua, $alamat, $nomor_hp, $hashed_password, 0);
 
     if ($stmtUser->execute()) {
         $user_id = $stmtUser->insert_id;
