@@ -34,6 +34,14 @@ function getLoggedInUser($conn) {
     }
 }
 
+
+function getAllQurban($conn) {
+    $sql = "SELECT * FROM qurban";
+    $result = $conn->query($sql);
+
+    return $result;
+}
+
 function getTabunganAndTarget($conn) {
     // Cek apakah user sudah login
     if (isset($_SESSION['user'])) {

@@ -3,6 +3,11 @@ require '../config/data.php';
 
 session_start();
 
+if (!isset($_SESSION['user_id'])) {
+  header("Location: login.php");
+  exit();
+}
+
 $kartuQurban = getKartuQurban($conn);
 $qurbanProgress = getQurbanProgress($conn);
 $transaksiData = getTransaksi($conn);
@@ -48,7 +53,7 @@ $tabunganData = getTabunganAndTarget($conn);
     <meta name="description" content="" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/img/favicon/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="../assets/img/favicon/dtpeduli.png" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

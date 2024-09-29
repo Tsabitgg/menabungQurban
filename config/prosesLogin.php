@@ -1,7 +1,8 @@
 <?php
 include 'data.php';
 
-// Ambil data dari form
+session_start(); // Pindahkan session_start ke sini
+
 $nomor_hp = $_POST['nomor_hp'];
 $password = $_POST['password'];
 
@@ -11,8 +12,7 @@ $result = $conn->query($sql);
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
-    if ($password === $row['password']) {
-        session_start();
+    if (password_verify($password, $row['password'])) {
         $_SESSION['user'] = [
             'user_id' => $row['user_id'],
             'nama' => $row['nama'],
@@ -22,10 +22,14 @@ if ($result->num_rows > 0) {
         header("Location: ../page/usersCard.php");
         exit();
     } else {
-        echo "Password salah!";
+        $_SESSION['error'] = "Password salah!";
+        header("Location: ../page/login.php"); // Redirect kembali ke halaman login
+        exit();
     }
 } else {
-    echo "Nomor HP tidak ditemukan!";
+    $_SESSION['error'] = "Nomor HP tidak ditemukan!";
+    header("Location: ../page/login.php"); // Redirect kembali ke halaman login
+    exit();
 }
 
 $conn->close();
