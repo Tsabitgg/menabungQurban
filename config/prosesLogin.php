@@ -1,7 +1,7 @@
 <?php
 include 'data.php';
 
-session_start(); // Pindahkan session_start ke sini
+session_start();
 
 $nomor_hp = $_POST['nomor_hp'];
 $password = $_POST['password'];
@@ -23,12 +23,12 @@ if ($result->num_rows > 0) {
         exit();
     } else {
         $_SESSION['error'] = "Password salah!";
-        header("Location: ../page/login.php"); // Redirect kembali ke halaman login
+        header("Location: ../page/login.php");
         exit();
     }
 } else {
     $_SESSION['error'] = "Nomor HP tidak ditemukan!";
-    header("Location: ../page/login.php"); // Redirect kembali ke halaman login
+    header("Location: ../page/login.php");
     exit();
 }
 

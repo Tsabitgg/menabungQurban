@@ -11,26 +11,22 @@ if ($conn->connect_error) {
 }
 
 function getLoggedInUser($conn) {
-    // Cek apakah user sudah login
     if (isset($_SESSION['user'])) {
-        // Ambil user ID dari session
         $user_id = $_SESSION['user']['user_id'];
 
-        // Query untuk mengambil data user berdasarkan user_id dari session
         $sql = "SELECT * FROM users WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id); // "i" untuk tipe integer
+        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        // Jika data ditemukan, kembalikan sebagai array
         if ($result->num_rows > 0) {
             return $result->fetch_assoc();
         } else {
-            return null; // Jika tidak ditemukan
+            return null;
         }
     } else {
-        return null; // Jika tidak ada user yang login
+        return null;
     }
 }
 
@@ -43,12 +39,9 @@ function getAllQurban($conn) {
 }
 
 function getTabunganAndTarget($conn) {
-    // Cek apakah user sudah login
     if (isset($_SESSION['user'])) {
-        // Ambil user_id dari session
         $user_id = $_SESSION['user']['user_id'];
 
-        // Query untuk menghitung total tabungan dan target tabungan
         $sql = "SELECT 
                     SUM(jumlah_terkumpul) AS total_tabungan, 
                     SUM(biaya) AS target_tabungan 
@@ -56,35 +49,31 @@ function getTabunganAndTarget($conn) {
                 WHERE user_id = ?";
         
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);  // "i" untuk tipe integer
+        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        // Jika data ditemukan, kembalikan sebagai array
         if ($result->num_rows > 0) {
             return $result->fetch_assoc();
         } else {
             return [
                 'total_tabungan' => 0, 
                 'target_tabungan' => 0
-            ]; // Jika tidak ada data, kembalikan nilai 0
+            ];
         }
     } else {
-        return null; // Jika tidak ada user yang login
+        return null;
     }
 }
 
 
 function getKartuQurban($conn) {
-    // Cek apakah user sudah login
     if (isset($_SESSION['user'])) {
-        // Ambil user_id dari session
         $user_id = $_SESSION['user']['user_id'];
 
-        // Query untuk mengambil data kartu qurban berdasarkan user yang login
         $sql = "SELECT * FROM kartu_qurban JOIN qurban on kartu_qurban.qurban_id = qurban.qurban_id WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id); // "i" untuk tipe integer
+        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -96,17 +85,14 @@ function getKartuQurban($conn) {
         }
         return $kartuQurban;
     } else {
-        return null; // Jika user belum login
+        return null;
     }
 }
 
 function getQurbanProgress($conn) {
-    // Cek apakah user sudah login
     if (isset($_SESSION['user'])) {
-        // Ambil user_id dari session
         $user_id = $_SESSION['user']['user_id'];
 
-        // Query untuk mengambil data kartu qurban berdasarkan user yang login
         $sql = "SELECT kartu_qurban.*, (kartu_qurban.jumlah_terkumpul / kartu_qurban.biaya) * 100 AS progress, 
         qurban.* FROM kartu_qurban JOIN qurban ON kartu_qurban.qurban_id = qurban.qurban_id
         WHERE kartu_qurban.user_id = ?";
@@ -158,8 +144,8 @@ function getQurbanProgress($conn) {
 
 function getTransaksi($conn) {
     if (isset($_SESSION['user'])) {
-        $user_id = $_SESSION['user']['user_id']; // Ambil user_id dari session
-        $sql = "SELECT * FROM transaksi WHERE user_id = ? ORDER BY tanggal_transaksi, transaksi_id DESC"; // Query berdasarkan user_id
+        $user_id = $_SESSION['user']['user_id'];
+        $sql = "SELECT * FROM transaksi WHERE user_id = ? ORDER BY tanggal_transaksi, transaksi_id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();

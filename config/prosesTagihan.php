@@ -24,14 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $va_number = '77906' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
 
-            // Insert ke tabel tagihan untuk VA
             $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
                           VALUES (?, CURDATE(), ?, ?, ?, ?, 0)";
             $stmtInsert = $conn->prepare($sqlInsert);
             $stmtInsert->bind_param("idsss", $kartu_qurban_id, $jumlah_setoran, $metode_pembayaran, $va_number, $created_time);
 
             if ($stmtInsert->execute()) {
-                // Kembalikan data untuk ditampilkan di modal
                 echo json_encode([
                     'success' => true,
                     'tipe_qurban' => $tipe_qurban,
@@ -59,14 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $va_number = '77906' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
         
-        // Insert ke tabel tagihan untuk QRIS
         $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
                       VALUES (?, CURDATE(), ?, ?, ?, ?, 0)";
         $stmtInsert = $conn->prepare($sqlInsert);
         $stmtInsert->bind_param("idsss", $kartu_qurban_id, $jumlah_setoran, $metode_pembayaran,$va_number, $created_time);
 
         if ($stmtInsert->execute()) {
-            // Kembalikan data untuk ditampilkan di modal
             echo json_encode([
                 'success' => true,
                 'jumlah_setoran' => $jumlah_setoran,
