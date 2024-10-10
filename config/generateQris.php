@@ -30,18 +30,13 @@ $result = $mysqli->query($query);
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
-    // Pastikan data yang seharusnya berupa bigint dikonversi menjadi integer
-    $accountNo = intval("5010118824");  // Pastikan ini angka
-    $vano = intval($row['va_number']);  // Konversi ke integer (bigint)
-    $transactionId = intval($row['created_time']); // Konversi created_time ke integer
-
     $data = [
-        "accountNo" => $accountNo,
-        "amount" => $row['jumlah_setoran'], // Ini kemungkinan tipe float atau double
-        "mitraCustomerId" => "LAZIZMU KOTA SEMARANG INFAQ511164", // Tetap string
-        "transactionId" => $transactionId,
+        "accountNo" => "5010118824",
+        "amount" => $row['jumlah_setoran'],
+        "mitraCustomerId" => "LAZIZMU KOTA SEMARANG INFAQ511164",
+        "transactionId" => $row['created_time'],
         "tipeTransaksi" => "MTR-GENERATE-QRIS-DYNAMIC",
-        "vano" => $vano // Pastikan va_number dikonversi ke bigint
+        "vano" => $row['va_number']
     ];
 
     // Encode data menjadi token JWT
@@ -70,8 +65,8 @@ if ($result->num_rows > 0) {
     // Eksekusi CURL dan ambil response
     $response = curl_exec($ch);
 
-    // Tampilkan response mentah untuk debugging
-    echo "Response raw: " . $response;
+    // Tampilkan response
+    echo $response;
 
     // Check for CURL errors
     if ($response === false) {
