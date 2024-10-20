@@ -19,16 +19,16 @@ if ($result->num_rows > 0) {
             'nomor_hp' => $row['nomor_hp'],
             'alamat' => $row['alamat']
         ];
-        header("Location: ../page/usersCard.php");
+        header("Location: ../view/usersCard.php");
         exit();
     } else {
         $_SESSION['error'] = "Password salah!";
-        header("Location: ../page/login.php");
+        header("Location: ../view/login.php");
         exit();
     }
 } else {
     $_SESSION['error'] = "Nomor HP tidak ditemukan!";
-    header("Location: ../page/login.php");
+    header("Location: ../view/login.php");
     exit();
 }
 

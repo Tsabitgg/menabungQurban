@@ -1,5 +1,5 @@
 <?php
-require '../config/data.php';
+require '../service/data.php';
 $qurbanData = getAllQurban($conn);
 ?>
 
@@ -88,7 +88,7 @@ if (isset($_SESSION['status']) && isset($_SESSION['message'])) {
 
     </div>
     <div class="w-1/2 pl-4">
-     <form method="POST" action="../config/prosesRegister.php">
+     <form method="POST" action="../service/prosesRegister.php">
      <div class="mb-4">
   <label class="block text-gray-700 font-semibold mb-2">Nama Pekurban <span class="text-red-500">*</span></label>
   <div class="flex space-x-4">

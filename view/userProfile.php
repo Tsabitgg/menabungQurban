@@ -1,5 +1,5 @@
 <?php
-require '../config/data.php';
+require '../service/data.php';
 session_start();
 
 

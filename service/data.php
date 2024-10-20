@@ -54,8 +54,6 @@ function updateUserProfile($conn, $user_id, $data) {
 }
 
 
-
-
 function getAllQurban($conn) {
     $sql = "SELECT * FROM qurban";
     $result = $conn->query($sql);

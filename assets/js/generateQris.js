@@ -10,7 +10,7 @@ src="https://code.jquery.com/jquery-3.6.0.min.js"
             if (metodePembayaran === 'qris') {
                 // Kirim request AJAX ke API generateQris.php
                 $.ajax({
-                    url: '../config/generateQris.php', // URL ke API
+                    url: '../service/generateQris.php', // URL ke API
                     type: 'GET',
                     data: {
                         createdTime: qurbanId // Menggunakan qurbanId sebagai createdTime

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($resultCheckHP->num_rows > 0) {
         $_SESSION['status'] = 'error';
         $_SESSION['message'] = 'Nomor HP sudah terdaftar. Gunakan nomor lain atau login.';
-        header("Location: ../page/register.php");
+        header("Location: ../view/register.php");
         exit();
     }
 
@@ -70,12 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $_SESSION['status'] = 'success';
         $_SESSION['message'] = 'Berhasil mendaftar, password anda adalah 6 digit belakang nomor handphone Anda: ' . $password;
-        header("Location: ../page/login.php");
+        header("Location: ../view/login.php");
         exit();
     } else {
         $_SESSION['status'] = 'error';
         $_SESSION['message'] = 'Gagal mendaftar. Silakan coba lagi.';
-        header("Location: ../page/register.php");
+        header("Location: ../view/register.php");
         exit();
     }
 }

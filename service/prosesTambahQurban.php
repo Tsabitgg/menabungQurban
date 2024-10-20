@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['status'] = 'error';
             $_SESSION['message'] = 'Gagal menambahkan Kartu Qurban. Coba lagi.';
         }
-        header("Location: ../page/usersCard.php");
+        header("Location: ../view/usersCard.php");
         exit();
     }
 }

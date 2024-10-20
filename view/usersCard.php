@@ -1,5 +1,5 @@
 <?php
-require '../config/data.php';
+require '../service/data.php';
 
 session_start();
 
@@ -508,7 +508,7 @@ $tabunganData = getTabunganAndTarget($conn);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="paymentMethodForm" method="post" action="../config/prosesTagihan.php">
+                <form id="paymentMethodForm" method="post" action="../service/prosesTagihan.php">
                     <input type="hidden" name="kartu_qurban_id" id="modalQurbanId">
                     <input type="hidden" name="jumlah_setoran" id="modalJumlahSetoran">
                     <!-- Input hidden untuk menyimpan metode pembayaran yang dipilih -->
@@ -677,7 +677,7 @@ $tabunganData = getTabunganAndTarget($conn);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" action="../config/prosesTambahQurban.php">
+                <form method="post" action="../service/prosesTambahQurban.php">
                     <!-- Input Nama Pengqurban -->
                     <div class="mb-3">
                         <label for="namaPengqurban" class="form-label">Nama Pengqurban</label>

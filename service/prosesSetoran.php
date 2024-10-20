@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
-        header("Location: ../page/usersCard.php");
+        header("Location: ../view/usersCard.php");
     } catch (Exception $e) {
         $conn->rollback();
         echo "Terjadi kesalahan: " . $e->getMessage();
