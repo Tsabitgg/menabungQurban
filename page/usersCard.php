@@ -65,6 +65,11 @@ $tabunganData = getTabunganAndTarget($conn);
 
     <!-- Icons. Uncomment required icon fonts -->
     <link rel="stylesheet" href="../assets/vendor/fonts/boxicons.css" />
+    <!-- Link Bootstrap CSS (jika belum ada) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Link Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <!-- Core CSS -->
     <link rel="stylesheet" href="../assets/vendor/css/core.css" class="template-customizer-core-css" />
@@ -122,33 +127,29 @@ $tabunganData = getTabunganAndTarget($conn);
               <!-- /title -->
 
               <ul class="navbar-nav flex-row align-items-center ms-auto">
-                <!-- Place this tag where you want the button to render. -->
-                <li class="nav-item lh-1 me-3">
-                  <a
-                    class="github-button"
-                    href="https://github.com/themeselection/sneat-html-admin-template-free"
-                    data-icon="octicon-star"
-                    data-size="large"
-                    data-show-count="true"
-                    aria-label="Star themeselection/sneat-html-admin-template-free on GitHub"
-                    >Star</a
-                  >
-                </li>
 
                 <!-- User -->
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                      <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                        <img 
+                            src="../assets/img/avatars/<?= (isset($user['jenis_kelamin']) && $user['jenis_kelamin'] === 'P') ? '5.png' : '1.png'; ?>" 
+                            alt="Avatar" 
+                            class="w-px-40 h-auto rounded-circle" 
+                        />
                     </div>
-                  </a>
+                </a>
                   <ul class="dropdown-menu dropdown-menu-end">
                     <li>
                       <a class="dropdown-item" href="#">
                         <div class="d-flex">
                           <div class="flex-shrink-0 me-3">
                             <div class="avatar avatar-online">
-                              <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                            <img 
+                            src="../assets/img/avatars/<?= (isset($user['jenis_kelamin']) && $user['jenis_kelamin'] === 'P') ? '5.png' : '1.png'; ?>" 
+                            alt="Avatar" 
+                            class="w-px-40 h-auto rounded-circle" 
+                            />
                             </div>
                           </div>
                           <div class="flex-grow-1">
@@ -162,7 +163,7 @@ $tabunganData = getTabunganAndTarget($conn);
                       <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="#">
+                      <a class="dropdown-item" href="userProfile.php">
                         <i class="bx bx-user me-2"></i>
                         <span class="align-middle">My Profile</span>
                       </a>
@@ -213,7 +214,7 @@ $tabunganData = getTabunganAndTarget($conn);
                     <div class="col-sm-7">
                       <div class="card-body">
                           <?php if ($user): ?>
-                              <h5 class="card-title text-primary">Tabungan Qurban - <?php echo htmlspecialchars($user['nama']); ?></h5>
+                              <h5 class="card-title text-primary">Tabungan Qurban - <?php echo htmlspecialchars($user['nama']) . ' ' . htmlspecialchars($user['nama_orang_tua']) ?></h5>
                               <p class="mb-4">
                                   Total Tabungan <span class="fw-bold">Rp <?php echo number_format($tabunganData['total_tabungan'], 0, ',', '.'); ?></span>
                                   Dari Target <span class="fw-bold">Rp <?php echo number_format($tabunganData['target_tabungan'], 0, ',', '.'); ?></span>
@@ -498,33 +499,50 @@ $tabunganData = getTabunganAndTarget($conn);
 <!-- End Modal Setoran -->
 
 
-                                <!-- Modal Pilihan Metode Pembayaran -->
-                                <div class="modal fade" id="modalPembayaran" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Pilih Metode Pembayaran</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form id="paymentMethodForm" method="post" action="../config/prosesTagihan.php">
-                                                    <input type="hidden" name="kartu_qurban_id" id="modalQurbanId">
-                                                    <input type="hidden" name="jumlah_setoran" id="modalJumlahSetoran">
-                                                    
-                                                    <div class="mb-3">
-                                                        <label for="metodePembayaran" class="form-label">Metode Pembayaran</label>
-                                                        <select class="form-control" id="metodePembayaran" name="metode_pembayaran" required>
-                                                            <option value="qris">QRIS</option>
-                                                            <option value="va">Virtual Account</option>
-                                                        </select>
-                                                    </div>
+<!-- Modal Pilihan Metode Pembayaran -->
+<div class="modal fade" id="modalPembayaran" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Pilih Metode Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentMethodForm" method="post" action="../config/prosesTagihan.php">
+                    <input type="hidden" name="kartu_qurban_id" id="modalQurbanId">
+                    <input type="hidden" name="jumlah_setoran" id="modalJumlahSetoran">
+                    <!-- Input hidden untuk menyimpan metode pembayaran yang dipilih -->
+                    <input type="hidden" name="metode_pembayaran" id="metodePembayaran" required>
 
-                                                    <button type="button" class="btn btn-primary" id="btnBayarSekarang">Bayar Sekarang</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="mb-3">
+                        <label class="form-label">Metode Pembayaran</label>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <!-- Tombol metode pembayaran QRIS dengan ikon -->
+                                <button type="button" class="btn btn-outline-primary payment-method-btn" id="qrisButton" onclick="selectPaymentMethod('qris')">
+                                    <i class="bi bi-qr-code" style="font-size: 2rem;"></i><br>
+                                    QRIS
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <!-- Tombol metode pembayaran Virtual Account dengan ikon -->
+                                <button type="button" class="btn btn-outline-primary payment-method-btn" id="vaButton" onclick="selectPaymentMethod('va')">
+                                    <i class="bi bi-credit-card" style="font-size: 2rem;"></i><br>
+                                    Virtual Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" id="btnBayarSekarang">Bayar Sekarang</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
                                 <div class="modal fade" id="qrisModal" tabindex="-1" aria-labelledby="qrisModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -567,8 +585,7 @@ $tabunganData = getTabunganAndTarget($conn);
                                 <i class="fas fa-copy"></i> Salin
                             </button>
                         </div>
-                        
-                        <p><strong>Batas Waktu Pembayaran:</strong> <span id="detailCountdown" class="text-danger"></span></p>
+
                     </div>
                 </div>
 
@@ -629,26 +646,7 @@ $tabunganData = getTabunganAndTarget($conn);
                   <script>
                     document.write(new Date().getFullYear());
                   </script>
-                  , made with ❤️ by
-                  <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
-                </div>
-                <div>
-                  <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
-                  <a href="https://themeselection.com/" target="_blank" class="footer-link me-4">More Themes</a>
-
-                  <a
-                    href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
-                    target="_blank"
-                    class="footer-link me-4"
-                    >Documentation</a
-                  >
-
-                  <a
-                    href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
-                    target="_blank"
-                    class="footer-link me-4"
-                    >Support</a
-                  >
+                  , DT Peduli
                 </div>
               </div>
             </footer>
@@ -666,7 +664,7 @@ $tabunganData = getTabunganAndTarget($conn);
 <!-- Tombol untuk membuka modal -->
 <div class="buy-now">
   <button type="button" class="btn btn-danger btn-buy-now" data-bs-toggle="modal" data-bs-target="#modalTambahKartuQurban">
-    Tambah Kartu Qurban
+    Tambah Hewan Qurban
   </button>
 </div>
 
@@ -675,7 +673,7 @@ $tabunganData = getTabunganAndTarget($conn);
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Kartu Qurban</h5>
+                <h5 class="modal-title">Tambah Hewan Qurban</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -735,6 +733,48 @@ $tabunganData = getTabunganAndTarget($conn);
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <!-- css -->
+    <style>
+    /* Gaya tombol metode pembayaran */
+    .payment-method-btn {
+        width: 100%;
+        padding: 20px;
+        font-size: 1.2rem;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Gaya tombol yang aktif */
+    .payment-method-btn.active {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    /* Hover effect untuk mempercantik tampilan */
+    .payment-method-btn:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    /* Icon size adjustment */
+    .payment-method-btn i {
+        margin-bottom: 10px;
+    }
+
+    /* Penyesuaian modal */
+    .modal-body {
+        padding: 30px;
+    }
+
+    /* Style form label */
+    .form-label {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+</style>
   </body>
 </html>
 <?php

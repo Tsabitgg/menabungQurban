@@ -1,7 +1,7 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "Smartpay1ct";
+$host = "103.23.103.43";
+$user = "elpe";
+$pass = "Bismillah99";
 $database = "menabung_qurban";
 
 $conn = new mysqli($host, $user, $pass, $database);
@@ -29,6 +29,31 @@ function getLoggedInUser($conn) {
         return null;
     }
 }
+
+function updateUserProfile($conn, $user_id, $data) {
+    $sql = "UPDATE users SET nama = ?, nama_orang_tua = ?, email = ?, alamat = ?, kota = ?, nomor_hp = ?, jenis_kelamin = ?, tanggal_lahir = ? WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param("ssssssssi", 
+        $data['nama'], 
+        $data['nama_orang_tua'], 
+        $data['email'], 
+        $data['alamat'],
+        $data['kota'], 
+        $data['nomor_hp'], 
+        $data['jenis_kelamin'], 
+        $data['tanggal_lahir'], 
+        $user_id
+    );
+
+    if ($stmt->execute()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
 
 
 function getAllQurban($conn) {

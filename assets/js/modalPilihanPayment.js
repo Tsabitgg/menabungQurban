@@ -18,6 +18,22 @@ function openPaymentModal(kartuQurbanId) {
   $("#modalPembayaran").modal("show");
 }
 
+function selectPaymentMethod(method) {
+  // Menyimpan metode pembayaran yang dipilih di input hidden dengan id 'metodePembayaran'
+  document.getElementById('metodePembayaran').value = method;
+  
+  // Opsional: Update button styles untuk menunjukkan metode yang dipilih
+  document.getElementById('qrisButton').classList.remove('active');
+  document.getElementById('vaButton').classList.remove('active');
+  
+  if (method === 'qris') {
+      document.getElementById('qrisButton').classList.add('active');
+  } else if (method === 'va') {
+      document.getElementById('vaButton').classList.add('active');
+  }
+}
+
+
 document
   .getElementById("btnBayarSekarang")
   .addEventListener("click", function () {
