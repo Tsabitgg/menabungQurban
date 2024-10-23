@@ -51,7 +51,7 @@ if ($result->num_rows > 0) {
     $jwtToken = JWT::encode($data, $secretKey);
 
     // URL API
-    $url = 'http://10.99.23.23:8080/api/qris';
+    $url = 'http://10.99.23.111/qris/bandung_dt_peduli/server.php';
 
     // Mengirimkan token melalui URL
     $urlWithToken = $url . '?token=' . urlencode($jwtToken);
