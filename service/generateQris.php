@@ -2,6 +2,7 @@
 
 require 'jwt.php';
 
+// Koneksi database
 $host = 'localhost:3306';
 $db = 'menabung_qurban';
 $user = 'root';
@@ -10,30 +11,36 @@ $pass = 'Smartpay1ct';
 $mysqli = new mysqli($host, $user, $pass, $db);
 
 if ($mysqli->connect_error) {
-    die('Koneksi gagal: ' . $mysqli->connect_error);
+    die(json_encode(['success' => false, 'message' => 'Koneksi gagal: ' . $mysqli->connect_error]));
 }
 
+// Pengaturan header CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Ambil billing_id dari request parameter
+// Ambil parameter createdTime dari request
 $createdTime = isset($_GET['createdTime']) ? intval($_GET['createdTime']) : 0;
 
 if ($createdTime <= 0) {
-    die('createdTime tidak valid');
+    die(json_encode(['success' => false, 'message' => 'createdTime tidak valid']));
 }
 
-$query = "SELECT * FROM tagihan WHERE created_time = $createdTime";
-$result = $mysqli->query($query);
+// Menggunakan prepared statement untuk menghindari SQL Injection
+$query = "SELECT * FROM tagihan WHERE created_time = ?";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param('s', $createdTime);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
+    // Data yang akan dikodekan ke JWT
     $data = [
-        "accountNo" => "5010118824",
+        "accountNo" => "1030005418",
         "amount" => $row['jumlah_setoran'],
-        "mitraCustomerId" => "LAZIZMU KOTA SEMARANG INFAQ511164",
+        "mitraCustomerId" => "DT Peduli508362",
         "transactionId" => $row['created_time'],
         "tipeTransaksi" => "MTR-GENERATE-QRIS-DYNAMIC",
         "vano" => $row['va_number']
@@ -43,38 +50,32 @@ if ($result->num_rows > 0) {
     $secretKey = 'TokenJWT_BMI_ICT';
     $jwtToken = JWT::encode($data, $secretKey);
 
-    $url = 'http://10.99.23.23:8080/api/qris';
+    // URL API
+    $url = 'http://103.23.103.43/qris/bandung_dt_peduli/server.php';
+
+    // Mengirimkan token melalui URL
+    $urlWithToken = $url . '?token=' . urlencode($jwtToken);
 
     // Inisialisasi CURL
-    $ch = curl_init($url);
-
-    // Data yang akan dikirimkan dengan request POST
-    $postData = json_encode([
-        'token' => $jwtToken
-    ]);
+    $ch = curl_init($urlWithToken);
 
     // Set CURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Content-Length: ' . strlen($postData)
+        'Content-Type: application/json'
     ]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
     // Eksekusi CURL dan ambil response
     $response = curl_exec($ch);
 
-    // Tampilkan response
-    echo $response;
-
-    // Check for CURL errors
+    // Cek apakah eksekusi CURL berhasil
     if ($response === false) {
-        echo 'CURL Error: ' . curl_error($ch);
+        die(json_encode(['success' => false, 'message' => 'CURL Error: ' . curl_error($ch)]));
     } else {
         // Decode response untuk mengambil transactionQrId
         $responseData = json_decode($response, true);
-        
+
         // Periksa apakah 'transactionDetail' dan 'transactionQrId' ada dalam response
         if (isset($responseData['transactionDetail']['transactionQrId'])) {
             $transactionQrId = $responseData['transactionDetail']['transactionQrId'];
@@ -82,29 +83,34 @@ if ($result->num_rows > 0) {
             // Update database dengan transactionQrId
             $updateQuery = "UPDATE tagihan SET transaksi_qr_id = ? WHERE created_time = ?";
             $stmt = $mysqli->prepare($updateQuery);
-            $stmt->bind_param('si', $transactionQrId, $createdTime);
+            $stmt->bind_param('ss', $transactionQrId, $createdTime);
 
             // Execute statement untuk menyimpan perubahan
             if ($stmt->execute()) {
-                echo '';
+                // Tambahkan transactionQrId ke dalam respons untuk ditampilkan ke klien
+                $responseData['transactionQrId'] = $transactionQrId;
             } else {
-                echo 'Gagal menyimpan Transaction QR ID: ' . $stmt->error;
+                echo json_encode(['success' => false, 'message' => 'Gagal menyimpan Transaction QR ID: ' . $stmt->error]);
             }
 
             $stmt->close();
         } else {
-            echo 'Transaction QR ID tidak ditemukan dalam response.';
+            error_log("Response: " . json_encode($responseData));
+            echo json_encode(['success' => false, 'message' => 'Transaction QR ID tidak ditemukan dalam response']);
         }
+
+        // Kirim respons dari server QRIS (termasuk transactionQrId yang diperoleh)
+        echo json_encode($responseData);
     }
 
     // Tutup CURL
     curl_close($ch);
 
 } else {
-    echo "Data tidak ditemukan";
+    echo json_encode(['success' => false, 'message' => 'Data tidak ditemukan']);
 }
 
-// Tutup koneksi
+// Tutup koneksi database
 $mysqli->close();
 
 ?>

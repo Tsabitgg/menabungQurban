@@ -1,138 +1,87 @@
 function openPaymentModal(kartuQurbanId) {
-  var jumlahSetoran = document.getElementById(
-    "jumlahSetoran" + kartuQurbanId
-  ).value;
+    const jumlahSetoran = document.getElementById(`jumlahSetoran${kartuQurbanId}`).value;
+    
+    // Set nilai input hidden ke dalam modal
+    document.getElementById('modalQurbanId').value = kartuQurbanId;
+    document.getElementById('modalJumlahSetoran').value = jumlahSetoran;
 
-  // Validasi jika input jumlah setoran kosong
-  if (jumlahSetoran === "") {
-    alert("Harap masukkan jumlah setoran.");
-    return;
-  }
-
-  // Set nilai di modal pembayaran
-  document.getElementById("modalQurbanId").value = kartuQurbanId;
-  document.getElementById("modalJumlahSetoran").value = jumlahSetoran;
-
-  // Tutup modal setoran dan buka modal pembayaran
-  $("#modalSetor" + kartuQurbanId).modal("hide");
-  $("#modalPembayaran").modal("show");
+    // Tampilkan modal pilihan metode pembayaran
+    const paymentModal = new bootstrap.Modal(document.getElementById('modalPembayaran'));
+    paymentModal.show();
 }
 
 function selectPaymentMethod(method) {
-  // Menyimpan metode pembayaran yang dipilih di input hidden dengan id 'metodePembayaran'
-  document.getElementById("metodePembayaran").value = method;
+    // Set metode pembayaran
+    document.getElementById('metodePembayaran').value = method;
 
-  // Opsional: Update button styles untuk menunjukkan metode yang dipilih
-  document.getElementById("qrisButton").classList.remove("active");
-  document.getElementById("vaButton").classList.remove("active");
-
-  if (method === "qris") {
-    document.getElementById("qrisButton").classList.add("active");
-  } else if (method === "va") {
-    document.getElementById("vaButton").classList.add("active");
-  }
+    // Handle tombol Bayar Sekarang
+    const btnBayarSekarang = document.getElementById('btnBayarSekarang');
+    btnBayarSekarang.onclick = function () {
+        const formData = new FormData(document.getElementById('paymentMethodForm'));
+        
+        // Kirim data ke prosesTagihan.php
+        fetch('../service/prosesTagihan.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (method === 'qris') {
+                    // Jika metode pembayaran QRIS, ambil created_time
+                    const createdTime = data.created_time;
+                    generateQris(createdTime); // Panggil fungsi untuk generate QRIS
+                } else if (method === 'va') {
+                    // Jika metode pembayaran VA, tampilkan detail tagihan
+                    displayBillDetails(data);
+                }
+            } else {
+                alert(data.message || 'Terjadi kesalahan, coba lagi.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat memproses pembayaran.');
+        });
+    };
 }
 
-document
-  .getElementById("btnBayarSekarang")
-  .addEventListener("click", function () {
-    var metodePembayaran = document.getElementById("metodePembayaran").value;
-    var kartuQurbanId = document.getElementById("modalQurbanId").value;
-    var jumlahSetoran = document.getElementById("modalJumlahSetoran").value;
-
-    if (metodePembayaran === "qris") {
-      // Kirim request ke prosesTagihan.php dan tunggu respons dengan createdTime
-      fetch("../service/prosesTagihan.php", {
-        method: "POST",
-        body: new FormData(document.getElementById("paymentMethodForm")),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          if (data.success) {
-            var createdTime = data.created_time; // Ambil createdTime dari respons
-            console.log("Created Time: ", createdTime);
-
-            // Setelah mendapatkan createdTime, hit generateQris.php dengan metode POST dan query string
-            fetch(`../service/generateQris.php?createdTime=${createdTime}`, {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-              },
-            })
-              .then((response) => response.text()) // Mengambil respons sebagai teks mentah
-              .then((responseText) => {
-                console.log("Response Text: ", responseText); // Cek respons mentah dari server
-
-                // Lalu coba parse ke JSON
-                try {
-                  const responseData = JSON.parse(responseText);
-                  console.log("Parsed JSON: ", responseData);
-
-                  if (
-                    responseData.transactionDetail &&
-                    responseData.transactionDetail.transactionQrId
-                  ) {
-                    var rawQrData = responseData.transactionDetail.rawQr;
-                    $("#qrisModalBody").html(
-                      '<img src="data:image/png;base64,' +
-                        rawQrData +
-                        '" alt="QRIS Code">'
-                    );
-                    $("#qrisModal").modal("show");
-                  } else {
-                    alert("Transaction QR ID tidak ditemukan dalam response.");
-                  }
-                } catch (e) {
-                  alert("Error parsing JSON: " + e.message);
-                }
-              })
-              .catch((error) =>
-                console.error("Error fetching QRIS data:", error)
-              );
-          } else {
-            alert("Terjadi kesalahan dalam membuat tagihan.");
-          }
+function generateQris(createdTime) {
+    // Panggil generateQris.php dengan createdTime
+    fetch(`generateQris.php?createdTime=${createdTime}`)
+        .then(response => response.text())
+        .then(qrisCode => {
+            // Tampilkan QRIS code di modal
+            document.getElementById('qrisModalBody').innerHTML = qrisCode; // Asumsikan QRIS code berupa HTML
+            const qrisModal = new bootstrap.Modal(document.getElementById('qrisModal'));
+            qrisModal.show();
         })
-        .catch((error) => console.error("Error:", error));
-    } else if (metodePembayaran === "va") {
-      fetch("../service/prosesTagihan.php", {
-        method: "POST",
-        body: new FormData(document.getElementById("paymentMethodForm")),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            document.getElementById("detailTipeQurban").textContent =
-              data.tipe_qurban;
-            document.getElementById("detailJumlahSetoran").textContent =
-              new Intl.NumberFormat("id-ID").format(data.jumlah_setoran);
-            document.getElementById("detailVaNumber").textContent =
-              data.va_number;
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat menghasilkan QRIS.');
+        });
+}
 
-            var modalDetailTagihan = new bootstrap.Modal(
-              document.getElementById("modalDetailTagihan")
-            );
-            modalDetailTagihan.show();
-          } else {
-            alert("Terjadi kesalahan dalam memproses pembayaran.");
-          }
-        })
-        .catch((error) => console.error("Error:", error));
-    } else {
-      alert("Metode pembayaran tidak valid.");
-    }
-  });
+function displayBillDetails(data) {
+    // Tampilkan detail tagihan di modal
+    document.getElementById('detailTipeQurban').textContent = data.tipe_qurban;
+    document.getElementById('detailJumlahSetoran').textContent = data.jumlah_setoran;
+    document.getElementById('detailTanggalTagihan').textContent = data.tanggal_tagihan;
+    document.getElementById('detailVaNumber').textContent = data.va_number;
 
-// Function to copy VA number to clipboard
+    // Tampilkan modal detail tagihan
+    const detailModal = new bootstrap.Modal(document.getElementById('modalDetailTagihan'));
+    detailModal.show();
+}
+
 function copyVaNumber() {
-  const vaNumber = document.getElementById("detailVaNumber").textContent;
-  navigator.clipboard.writeText(vaNumber).then(
-    function () {
-      alert("Nomor Virtual Account disalin ke clipboard!");
-    },
-    function (err) {
-      console.error("Gagal menyalin teks: ", err);
-    }
-  );
+    const vaNumberElement = document.getElementById('detailVaNumber');
+    const vaNumber = vaNumberElement.textContent;
+
+    // Salin VA Number ke clipboard
+    navigator.clipboard.writeText(vaNumber).then(() => {
+        alert('VA Number telah disalin ke clipboard.');
+    }).catch(err => {
+        console.error('Gagal menyalin VA Number:', err);
+    });
 }
