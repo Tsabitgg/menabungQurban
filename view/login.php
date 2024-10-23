@@ -142,7 +142,7 @@ if (isset($_SESSION['status']) && isset($_SESSION['message'])) {
               <h4 class="mb-2">Selamat Datang di Tabungan Qurban! 👋</h4>
               <p class="mb-4">Silahkan Login Menggunakan Akun anda</p>
 
-              <form id="formAuthentication" class="mb-3" action="../view/prosesLogin.php" method="POST">
+              <form id="formAuthentication" class="mb-3" action="../service/prosesLogin.php" method="POST">
                 <div class="mb-3">
                   <label for="nomor_hp" class="form-label" required>Nomor Handphone</label>
                   <input
