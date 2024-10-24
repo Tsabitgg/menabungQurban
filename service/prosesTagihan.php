@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $created_time = substr(round(microtime(true) * 1000), -8);
 
     if ($metode_pembayaran === 'va') {
-        $sql = "SELECT kartu_qurban.va_number as va_number, qurban.tipe_qurban as tipe_qurban 
+        $sql = "SELECT kartu_qurban.user_id as user_id, kartu_qurban.va_number as va_number, qurban.tipe_qurban as tipe_qurban 
                 FROM kartu_qurban 
                 JOIN qurban ON kartu_qurban.qurban_id = qurban.qurban_id 
                 WHERE kartu_qurban_id = ?";
@@ -21,13 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
+            $user_id = $row['user_id'];
             $va_number = '77906' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
 
-            $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
-                          VALUES (?, CURDATE(), ?, ?, ?, ?, 0)";
+            $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
+                          VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 0)";
             $stmtInsert = $conn->prepare($sqlInsert);
-            $stmtInsert->bind_param("idsss", $kartu_qurban_id, $jumlah_setoran, $metode_pembayaran, $va_number, $created_time);
+            $stmtInsert->bind_param("iidsss", $kartu_qurban_id, $user_id, $jumlah_setoran, $metode_pembayaran, $va_number, $created_time);
 
             if ($stmtInsert->execute()) {
                 echo json_encode([
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } elseif ($metode_pembayaran === 'qris') {
-        $sql = "SELECT kartu_qurban.va_number as va_number, qurban.tipe_qurban as tipe_qurban 
+        $sql = "SELECT kartu_qurban.user_id as user_id, kartu_qurban.va_number as va_number, qurban.tipe_qurban as tipe_qurban 
                 FROM kartu_qurban 
                 JOIN qurban ON kartu_qurban.qurban_id = qurban.qurban_id 
                 WHERE kartu_qurban_id = ?";
@@ -54,13 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
+            $user_id = $row['user_id'];
             $va_number = '77906' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
         
-        $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
-                      VALUES (?, CURDATE(), ?, ?, ?, ?, 0)";
+        $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
+                      VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 0)";
         $stmtInsert = $conn->prepare($sqlInsert);
-        $stmtInsert->bind_param("idsss", $kartu_qurban_id, $jumlah_setoran, $metode_pembayaran,$va_number, $created_time);
+        $stmtInsert->bind_param("iidsss", $kartu_qurban_id, $user_id, $jumlah_setoran, $metode_pembayaran,$va_number, $created_time);
 
         if ($stmtInsert->execute()) {
             echo json_encode([

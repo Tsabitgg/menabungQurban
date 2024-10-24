@@ -2,7 +2,6 @@
 
 require 'jwt.php';
 
-// Koneksi database
 $host = 'localhost';
 $db = 'menabung_qurban';
 $user = 'root';

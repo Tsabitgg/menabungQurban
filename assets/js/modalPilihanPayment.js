@@ -5,10 +5,24 @@ function openPaymentModal(kartuQurbanId) {
     document.getElementById('modalQurbanId').value = kartuQurbanId;
     document.getElementById('modalJumlahSetoran').value = jumlahSetoran;
 
+    // Tutup modal pembayaran sebelum memproses
+    const modalSetorId = `modalSetor${kartuQurbanId}`; // Pastikan ID modal benar
+    const setorModalElement = document.getElementById(modalSetorId);
+    
+    if (setorModalElement) { 
+        const setorModal = bootstrap.Modal.getInstance(setorModalElement);
+        if (setorModal) {
+            setorModal.hide(); // Tutup modal pembayaran jika instance ditemukan
+        }
+    } else {
+        console.error(`Modal dengan ID ${modalSetorId} tidak ditemukan.`);
+    }
+
     // Tampilkan modal pilihan metode pembayaran
     const paymentModal = new bootstrap.Modal(document.getElementById('modalPembayaran'));
     paymentModal.show();
 }
+
 
 function selectPaymentMethod(method) {
     // Set metode pembayaran

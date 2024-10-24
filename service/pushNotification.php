@@ -70,12 +70,15 @@ try {
             $transaction_qr_id = $transactionData['transaksi_qr_id'];
             $transaction_date = date('Y-m-d H:i:s');
 
+            // Menangani user_id yang mungkin NULL
+            $user_id = !empty($transactionData['user_id']) ? "'{$transactionData['user_id']}'" : 'NULL';
+
             // Query untuk memasukkan transaksi
             $insertQuery = "
             INSERT INTO transaksi
-                (kartu_qurban_id, tanggal_transaksi, jumlah_setoran, metode_pembayaran, va_number, transaksi_qr_id, created_time, success, tagihan_id)
+                (user_id, kartu_qurban_id, tanggal_transaksi, jumlah_setoran, metode_pembayaran, va_number, transaksi_qr_id, created_time, success, tagihan_id)
             VALUES 
-                ('{$transactionData['kartu_qurban_id']}', '{$transactionData['tanggal_tagihan']}', 
+                ($user_id, '{$transactionData['kartu_qurban_id']}', '{$transactionData['tanggal_tagihan']}', 
                 '$transaction_amount', '{$transactionData['metode_pembayaran']}', '{$transactionData['va_number']}', 
                 '{$transactionData['transaksi_qr_id']}', '{$transactionData['created_time']}', '$success', '{$transactionData['tagihan_id']}')";
 
