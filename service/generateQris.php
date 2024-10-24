@@ -3,7 +3,7 @@
 require 'jwt.php';
 
 // Koneksi database
-$host = 'localhost:3306';
+$host = 'localhost';
 $db = 'menabung_qurban';
 $user = 'root';
 $pass = 'Smartpay1ct';
@@ -29,7 +29,7 @@ if ($createdTime <= 0) {
 // Menggunakan prepared statement untuk menghindari SQL Injection
 $query = "SELECT * FROM tagihan WHERE created_time = ?";
 $stmt = $mysqli->prepare($query);
-$stmt->bind_param('s', $createdTime);
+$stmt->bind_param('i', $createdTime);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -39,12 +39,12 @@ if ($result->num_rows > 0) {
     // Data yang akan dikodekan ke JWT
     $data = [
         "accountNo" => "1030005418",
-        "amount" => $row['jumlah_setoran'],
+        "amount" => strval($row['jumlah_setoran']),
         "mitraCustomerId" => "DT Peduli508362",
-        "transactionId" => $row['created_time'],
+        "transactionId" => strval($row['created_time']),
         "tipeTransaksi" => "MTR-GENERATE-QRIS-DYNAMIC",
-        "vano" => $row['va_number']
-    ];
+        "vano" => strval($row['va_number'])
+    ];    
 
     // Encode data menjadi token JWT
     $secretKey = 'TokenJWT_BMI_ICT';
@@ -83,7 +83,7 @@ if ($result->num_rows > 0) {
             // Update database dengan transactionQrId
             $updateQuery = "UPDATE tagihan SET transaksi_qr_id = ? WHERE created_time = ?";
             $stmt = $mysqli->prepare($updateQuery);
-            $stmt->bind_param('ss', $transactionQrId, $createdTime);
+            $stmt->bind_param('si', $transactionQrId, $createdTime);
 
             // Execute statement untuk menyimpan perubahan
             if ($stmt->execute()) {

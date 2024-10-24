@@ -19,6 +19,10 @@ function selectPaymentMethod(method) {
     btnBayarSekarang.onclick = function () {
         const formData = new FormData(document.getElementById('paymentMethodForm'));
         
+        // Tutup modal pembayaran sebelum memproses
+        const paymentModal = bootstrap.Modal.getInstance(document.getElementById('modalPembayaran'));
+        paymentModal.hide(); // Tutup modal pembayaran
+
         // Kirim data ke prosesTagihan.php
         fetch('../service/prosesTagihan.php', {
             method: 'POST',
@@ -46,21 +50,50 @@ function selectPaymentMethod(method) {
     };
 }
 
+
 function generateQris(createdTime) {
     // Panggil generateQris.php dengan createdTime
-    fetch(`generateQris.php?createdTime=${createdTime}`)
-        .then(response => response.text())
-        .then(qrisCode => {
-            // Tampilkan QRIS code di modal
-            document.getElementById('qrisModalBody').innerHTML = qrisCode; // Asumsikan QRIS code berupa HTML
+    fetch(`../service/generateQris.php?createdTime=${createdTime}`)
+        .then(response => response.json()) // Asumsikan response dalam format JSON
+        .then(data => {
+            const rawQrData = data.transactionDetail.rawQrData; // Ambil rawQrData dari response
+            
+            // Hapus QR code lama jika ada
+            document.getElementById('qrisCode').innerHTML = "";
+
+            // Generate QR code baru
+            const qrcode = new QRCode(document.getElementById('qrisCode'), {
+                text: rawQrData, // Gunakan rawQrData untuk QR code
+                width: 256, // Ukuran QR code
+                height: 256
+            });
+
+            // Tampilkan modal QRIS
             const qrisModal = new bootstrap.Modal(document.getElementById('qrisModal'));
             qrisModal.show();
+
+            // Tambahkan fungsi download QR code
+            document.getElementById('downloadQrBtn').addEventListener('click', function () {
+                const qrCanvas = document.querySelector('#qrisCode canvas');
+                const qrImage = qrCanvas.toDataURL('image/png'); // Konversi canvas ke gambar
+                const link = document.createElement('a');
+                link.href = qrImage;
+                link.download = 'qris_code.png'; // Nama file download
+                link.click();
+            });
+
+            // // Tampilkan waktu expiry
+            // const expiryTime = data.transactionDetail.expiredTime;
+            // const expiryMinutes = Math.floor((new Date(expiryTime) - new Date()) / (1000 * 60)); // Hitung waktu kadaluarsa
+            // document.getElementById('expiryTime').textContent = expiryMinutes;
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Terjadi kesalahan saat menghasilkan QRIS.');
         });
 }
+
+
 
 function displayBillDetails(data) {
     // Tampilkan detail tagihan di modal

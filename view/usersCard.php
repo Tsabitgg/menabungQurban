@@ -546,22 +546,34 @@ $tabunganData = getTabunganAndTarget($conn);
     </div>
 </div>
 
-                                <div class="modal fade" id="qrisModal" tabindex="-1" aria-labelledby="qrisModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="qrisModalLabel">Pembayaran QRIS</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal untuk QRIS -->
+<div id="qrisModal" class="modal fade" tabindex="-1" aria-labelledby="qrisModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="qrisModalLabel">QRIS Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="qrisModalBody">
-                <!-- QRIS code akan ditampilkan di sini -->
+            <div class="modal-body text-center">
+                <!-- Teks instruksi -->
+                <p class="mb-4">Scan QRCode dibawah ini untuk menyelesaikan pembayaran</p>
+
+                <!-- Placeholder untuk QR code -->
+                <div id="qrisCode" class="d-flex justify-content-center mb-4">
+                    <!-- QR Code will be generated here -->
+                </div>
+
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <div class="modal-footer justify-content-between">
+                <!-- Tombol untuk menyimpan gambar QR -->
+                <button id="downloadQrBtn" class="btn btn-outline-primary">Download QR Code</button>
+                <!-- Tombol tutup modal -->
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <!-- Modal Detail Tagihan -->
@@ -729,6 +741,8 @@ $tabunganData = getTabunganAndTarget($conn);
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/modalPilihanPayment.js"></script>
+    <!-- Tambahkan library QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
       <!-- Page JS -->
     <script src="../assets/js/extended-ui-perfect-scrollbar.js"></script>
@@ -776,6 +790,29 @@ $tabunganData = getTabunganAndTarget($conn);
         font-size: 1.1rem;
         font-weight: bold;
         margin-bottom: 20px;
+    }
+</style>
+<!-- Custom CSS untuk tampilan modal -->
+<style>
+    #qrisModal .modal-content {
+        border-radius: 10px;
+        padding: 20px;
+    }
+    #qrisModal .modal-header {
+        border-bottom: 2px solid #dee2e6;
+    }
+    #qrisCode canvas {
+        border: 2px solid #0d6efd;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #fff;
+    }
+    #downloadQrBtn {
+        transition: background-color 0.3s ease;
+    }
+    #downloadQrBtn:hover {
+        background-color: #0d6efd;
+        color: #fff;
     }
 </style>
   </body>
