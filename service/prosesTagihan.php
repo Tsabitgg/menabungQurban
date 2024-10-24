@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $user_id = $row['user_id'];
-            $va_number = '77906' . $row['va_number'];
+            $va_number = '797754' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
 
             $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $user_id = $row['user_id'];
-            $va_number = '77906' . $row['va_number'];
+            $va_number = '797754' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
         
         $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 

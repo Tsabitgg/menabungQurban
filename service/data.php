@@ -1,7 +1,7 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "Smartpay1ct";
+$host = "103.23.103.43";
+$user = "elpe";
+$pass = "Bismillah99";
 $database = "menabung_qurban";
 
 $conn = new mysqli($host, $user, $pass, $database);
@@ -168,7 +168,15 @@ function getQurbanProgress($conn) {
 function getTransaksi($conn) {
     if (isset($_SESSION['user'])) {
         $user_id = $_SESSION['user']['user_id'];
-        $sql = "SELECT * FROM transaksi WHERE user_id = ? ORDER BY tanggal_transaksi, transaksi_id DESC";
+        
+        // Menambahkan join dengan tabel qurban untuk mengambil tipe_qurban
+        $sql = "SELECT transaksi.*, qurban.tipe_qurban 
+                FROM transaksi 
+                JOIN kartu_qurban ON transaksi.kartu_qurban_id = kartu_qurban.kartu_qurban_id 
+                JOIN qurban ON kartu_qurban.qurban_id = qurban.qurban_id 
+                WHERE transaksi.user_id = ? 
+                ORDER BY transaksi.tanggal_transaksi DESC, transaksi.transaksi_id DESC";
+        
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -185,6 +193,8 @@ function getTransaksi($conn) {
         return null;
     }
 }
+
+
 
 function getLastTransaksiDaging($conn) {
     $user_id = $_SESSION['user']['user_id'];

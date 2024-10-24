@@ -403,10 +403,10 @@ $tabunganData = getTabunganAndTarget($conn);
                         <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                             <div class="me-2">
                                 <small class="text-muted d-block mb-1"><?php echo date('d F Y', strtotime($transaksi['tanggal_transaksi'])); ?></small>
-                                <h6 class="mb-0"><?php echo $transaksi['tipe']; ?></h6>
+                                <h6 class="mb-0"><?php echo $transaksi['tipe_qurban']; ?></h6>
                             </div>
                             <div class="user-progress d-flex align-items-center gap-1">
-                                <h6 class="mb-0"><?php echo number_format($transaksi['jumlah'], 0, ',', '.'); ?></h6>
+                                <h6 class="mb-0"><?php echo number_format($transaksi['jumlah_setoran'], 0, ',', '.'); ?></h6>
                                 <span class="text-muted"><?php echo $transaksi['metode_pembayaran']; ?></span>
                             </div>
                         </div>
