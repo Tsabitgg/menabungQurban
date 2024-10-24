@@ -82,8 +82,17 @@ try {
                 '$transaction_amount', '{$transactionData['metode_pembayaran']}', '{$transactionData['va_number']}', 
                 '{$transactionData['transaksi_qr_id']}', '{$transactionData['created_time']}', '$success', '{$transactionData['tagihan_id']}')";
 
-            // Eksekusi query untuk insert ke tabel transaction
+            // Eksekusi query untuk insert ke tabel transaksi
             if ($mysqli->query($insertQuery)) {
+                // Update kolom jumlah_terkumpul di tabel kartu_qurban
+                $kartuQurbanId = $transactionData['kartu_qurban_id'];
+                $updateKartuQuery = "
+                    UPDATE kartu_qurban 
+                    SET jumlah_terkumpul = jumlah_terkumpul + $transaction_amount 
+                    WHERE kartu_qurban_id = '$kartuQurbanId'
+                ";
+                $mysqli->query($updateKartuQuery); // Eksekusi query untuk update
+
                 $PAYMENT = $transaction_amount; // menggunakan jumlah yang sudah dikurangi
 
                 // Keluarkan respon sukses tanpa mengirim pesan WhatsApp
@@ -95,7 +104,7 @@ try {
                     'transactionId' => $transactionId
                 ]);
             } else {
-                echo "Gagal memasukkan data ke tabel transaction: " . $mysqli->error;
+                echo "Gagal memasukkan data ke tabel transaksi: " . $mysqli->error;
             }
         }
     } else {
