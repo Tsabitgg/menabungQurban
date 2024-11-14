@@ -47,7 +47,8 @@ if (isset($_SESSION['status']) && isset($_SESSION['message'])) {
   <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg">
    <div class="flex">
     <div class="w-1/2 pr-4">
-     <img alt="Tabungan Qurban banner" class="w-full mb-4" height="200" src="../assets/img/illustrations/banner-main.jpg" width="600"/>
+     <img alt="Tabungan Qurban banner" class="w-full mb-4" height="200" src="../assets/img/illustrations/banner-main2.jpg" width="600"/>
+     <img alt="Tabungan Qurban banner3" class="w-full mb-4" height="200" src="../assets/img/illustrations/banner-main3.jpg" width="400"/>
      <p class="text-gray-700 mb-4" style="text-align: justify;">
       DT Peduli memfasilitasi masyarakat menyalurkan hewan kurban impian dari sekarang untuk berkurban di masa mendatang. Melalui tabungan kurban, masyarakat dengan mudah mendapatkan hewan kurban yang diinginkan.
      </p>
