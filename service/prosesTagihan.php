@@ -6,6 +6,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $jumlah_setoran = $_POST['jumlah_setoran'];
     $metode_pembayaran = $_POST['metode_pembayaran'];
 
+        // Hitung biaya admin berdasarkan jumlah setoran
+    if ($jumlah_setoran > 100000) {
+        $biaya_admin = 3000;
+    } elseif ($jumlah_setoran < 100000) {
+        $biaya_admin = $jumlah_setoran * 0.025; // 2,5%
+    } else {
+        $biaya_admin = 3000;
+    }
+
+    $total_tagihan = $jumlah_setoran + $biaya_admin;
+
     // Generate 8 digit unik dari milisecond datetime
     $created_time = substr(round(microtime(true) * 1000), -8);
 
@@ -25,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $va_number = '797754' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
 
-            $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
-                          VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 0)";
+            $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, biaya_admin, total_tagihan, metode_pembayaran, va_number, created_time, success) 
+                          VALUES (?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, 0)";
             $stmtInsert = $conn->prepare($sqlInsert);
-            $stmtInsert->bind_param("iidsss", $kartu_qurban_id, $user_id, $jumlah_setoran, $metode_pembayaran, $va_number, $created_time);
+            $stmtInsert->bind_param("iidddsss", $kartu_qurban_id, $user_id, $jumlah_setoran, $biaya_admin, $total_tagihan, $metode_pembayaran, $va_number, $created_time);
 
             if ($stmtInsert->execute()) {
                 echo json_encode([
@@ -59,10 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $va_number = '797754' . $row['va_number'];
             $tipe_qurban = $row['tipe_qurban'];
         
-        $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, metode_pembayaran, va_number, created_time, success) 
-                      VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 0)";
+        $sqlInsert = "INSERT INTO tagihan (kartu_qurban_id, user_id, tanggal_tagihan, jumlah_setoran, biaya_admin, total_tagihan, metode_pembayaran, va_number, created_time, success) 
+                      VALUES (?, ?, CURDATE(), ?, ?, ?, ?, ?, ?, 0)";
         $stmtInsert = $conn->prepare($sqlInsert);
-        $stmtInsert->bind_param("iidsss", $kartu_qurban_id, $user_id, $jumlah_setoran, $metode_pembayaran,$va_number, $created_time);
+        $stmtInsert->bind_param("iidddsss", $kartu_qurban_id, $user_id, $jumlah_setoran,$biaya_admin, $total_tagihan, $metode_pembayaran, $va_number, $created_time);
 
         if ($stmtInsert->execute()) {
             echo json_encode([

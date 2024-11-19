@@ -63,8 +63,9 @@ try {
         if ($billingResult->num_rows > 0) {
             $transactionData = $billingResult->fetch_assoc();
 
-            // Kurangi billing_amount sebesar 3000
-            $transaction_amount = $transactionData['jumlah_setoran'];
+            $jumlah_setoran = $transactionData['jumlah_setoran'];
+            $transaction_amount = $transactionData['total_tagihan'];
+
 
             $success = 1;
             $transaction_qr_id = $transactionData['transaksi_qr_id'];
@@ -76,10 +77,11 @@ try {
             // Query untuk memasukkan transaksi
             $insertQuery = "
             INSERT INTO transaksi
-                (user_id, kartu_qurban_id, tanggal_transaksi, jumlah_setoran, metode_pembayaran, va_number, transaksi_qr_id, created_time, success, tagihan_id)
+                (user_id, kartu_qurban_id, tanggal_transaksi, jumlah_setoran, biaya_admin, total_tagihan, metode_pembayaran, va_number, transaksi_qr_id, created_time, success, tagihan_id)
             VALUES 
                 ($user_id, '{$transactionData['kartu_qurban_id']}', '{$transactionData['tanggal_tagihan']}', 
-                '$transaction_amount', '{$transactionData['metode_pembayaran']}', '{$transactionData['va_number']}', 
+                '{$transactionData['jumlah_setoran']}','{$transactionData['biaya_admin']}','$transaction_amount',
+                '{$transactionData['metode_pembayaran']}', '{$transactionData['va_number']}', 
                 '{$transactionData['transaksi_qr_id']}', '{$transactionData['created_time']}', '$success', '{$transactionData['tagihan_id']}')";
 
             // Eksekusi query untuk insert ke tabel transaksi
@@ -88,12 +90,12 @@ try {
                 $kartuQurbanId = $transactionData['kartu_qurban_id'];
                 $updateKartuQuery = "
                     UPDATE kartu_qurban 
-                    SET jumlah_terkumpul = jumlah_terkumpul + $transaction_amount 
+                    SET jumlah_terkumpul = jumlah_terkumpul + $jumlah_setoran 
                     WHERE kartu_qurban_id = '$kartuQurbanId'
                 ";
                 $mysqli->query($updateKartuQuery); // Eksekusi query untuk update
 
-                $PAYMENT = $transaction_amount; // menggunakan jumlah yang sudah dikurangi
+                $PAYMENT = $jumlah_setoran; // menggunakan jumlah yang sudah dikurangi
 
                 // Keluarkan respon sukses tanpa mengirim pesan WhatsApp
                 header('Content-Type: application/json');

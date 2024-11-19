@@ -38,7 +38,7 @@ if ($result->num_rows > 0) {
     // Data yang akan dikodekan ke JWT
     $data = [
         "accountNo" => "1030005418",
-        "amount" => strval($row['jumlah_setoran']),
+        "amount" => strval($row['total_tagihan']),
         "mitraCustomerId" => "DT Peduli508362",
         "transactionId" => strval($row['created_time']),
         "tipeTransaksi" => "MTR-GENERATE-QRIS-DYNAMIC",
