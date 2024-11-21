@@ -176,9 +176,9 @@ $transaksi = new JWT();
 $key = "TokenJWT_BMI_ICT";
 
 // Database configuration
-$db_host = '103.23.103.43:3306';
-$db_username = 'root';
-$db_password = 'Smartpay1ct';
+$db_host = '10.99.23.111:3306';
+$db_username = 'elpe';
+$db_password = 'Bismillah99';
 $db_name = 'menabung_qurban';
 
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
@@ -205,44 +205,21 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 	$CHANNELID =  $decoded_array['CHANNELID'];
 
 	$TRXDATE = date_create($TRXDATE);
-	//$TRXDATE = date("Y-m-d h:i:s",strtotime($TRXDATE)); //server publik 39 atau lokal 20
-	$TRXDATE = date_format($TRXDATE, "Y-m-d h:i:s"); //server publik 35 atau lokal 22
-	// $VANO10 = substr($VANO, 6, 16);
-	//cek NIM
-	//$ceknim = "Select NoInduk from mst_personal WHERE concat('751000', LPAD(NoInduk, 10, 0))='".$VANO."' or concat('751000', LPAD(NoLain, 10, 0))='".$VANO."'";
-	//$ceknim = "Select NOCUST, NMCUST from scctcust WHERE (LPAD(NOCUST,10,0)='" . $VANO10 . "' or NUM2ND='" . $VANO10 . "') and STCUST=1";
-	$ceknim = "SELECT billing.va_number as VA, billing.username as NMCUST
-    FROM billing
-    WHERE billing.va_number = '" . $VANO . "' 
-    and billing.success = false
-    ORDER BY billing.billing_date DESC
-    LIMIT 1
-	";
 
-// 	$ceknim = "SELECT users.va_number AS VA, users.username AS NMCUST, billing.billing_id  , billing.billing_amount
-// FROM billing
-// JOIN users ON billing.user_id = users.user_id
-// WHERE billing.va_number = '" . $VANO . "' 
-// AND billing.success = false
-// AND billing.billing_id = (
-//     SELECT MAX(billing_id)
-//     FROM billing
-//     WHERE va_number = '" . $VANO . "' 
-//     AND success = false
-// )
-// GROUP BY users.va_number, users.username
-// LIMIT 1";
+	$TRXDATE = date_format($TRXDATE, "Y-m-d h:i:s");
+	$ceknim = "SELECT tagihan.va_number AS VA, users.nama AS NMCUST
+    FROM tagihan JOIN users 
+    ON tagihan.user_id = users.user_id 
+	WHERE tagihan.va_number = '7977542762812768' 
+    AND tagihan.success = false
+    ORDER BY tagihan.tanggal_tagihan DESC
+    LIMIT 1;";
 
 
-
-
-	// $quceknim = mysql_query($ceknim) or die('Wups...');
-	// $adanim = mysql_num_rows($quceknim);
-	// $datanya = mysql_fetch_array($quceknim);
 	$quceknim = $conn->query($ceknim) or die('Wups...');
 	$adanim = $quceknim->num_rows;
 	$datanya = $quceknim->fetch_array();
-	//$Nama = $datanya['NMCUST'];
+
 	$mashemaganteng = $datanya['NMCUST'];
 
 	if (!$quceknim) // jika query error
@@ -262,55 +239,27 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 	} else {
 
 		if ($adanim == 1) {
-	// 		$cektagihan = "SELECT
-	// sum(SCCTBILL.BILLAM) as nominal, 
-	// SCCTCUST.NMCUST as Nama,
-	// SCCTCUST.NUM2ND as NoPend,
-	// SCCTCUST.NOCUST as NIM,
-	// SCCTBILL.BILLNM as NamaTagihan
-	// FROM SCCTBILL
-	// LEFT JOIN SCCTCUST on SCCTCUST.CUSTID = SCCTBILL.CUSTID 
-	// where 
-	// ( LPAD(NOCUST,10,0)='" . $VANO10 . "' or NUM2ND='" . $VANO10 . "')
-	// AND SCCTBILL.FSTSBolehBayar = 1 
-	// AND SCCTBILL.PAIDST=0 
-	// AND SCCTCUST.STCUST = 1
-	
-	// group by SCCTCUST.NMCUST,
-	// SCCTCUST.NUM2ND,
-	// SCCTCUST.NOCUST,
-	// SCCTBILL.BILLNM,
-	// SCCTBILL.FUrutan
-	// order by SCCTBILL.FUrutan DESC";
-	$cektagihan = "SELECT
-    billing.billing_id,
-    billing.billing_amount AS nominal,
-    billing.username AS Nama,
-    billing.phone_number AS NoPend,
-    billing.va_number AS NIM,
-    billing.category AS NamaTagihan,
-    billing.message,
-    COALESCE(billing.zakat_id, billing.campaign_id, billing.infak_id, billing.wakaf_id) AS related_id,
-    CASE 
-        WHEN billing.user_id IS NOT NULL THEN billing.user_id 
-        ELSE NULL 
-    END AS user_id
-FROM billing
-WHERE billing.va_number = '" . $VANO . "'
-  AND billing.success = 0
-GROUP BY billing.billing_id, 
-         billing.username, 
-         billing.phone_number, 
-         billing.va_number, 
-         related_id,
-         billing.user_id
-ORDER BY billing.billing_date DESC 
-LIMIT 1;
-";
+			$cektagihan = "
+			select tagihan.tagihan_id,
+				tagihan.total_tagihan AS nominal,
+				users.nama AS Nama,
+				tagihan.va_number AS NIM,
+				qurban.tipe_qurban AS NamaTagihan,
+				tagihan.user_id,
+				tagihan.kartu_qurban_id,
+				tagihan.biaya_admin,
+				tagihan.jumlah_setoran,
+				tagihan.metode_pembayaran
+			FROM tagihan
+			JOIN users ON tagihan.user_id = users.user_id
+			JOIN kartu_qurban ON tagihan.kartu_qurban_id = kartu_qurban.kartu_qurban_id
+			JOIN qurban ON kartu_qurban.qurban_id = qurban.qurban_id
+			WHERE tagihan.va_number = '" . $VANO . "'
+			  AND tagihan.success = 0
+			  and tagihan.total_tagihan is not null
+			ORDER BY tagihan.tanggal_tagihan, tagihan.tagihan_id DESC
+			LIMIT 1;";			
 
-
-
-			// $listtagihan = mysql_query($cektagihan) or die('witszz...query tagihan opo ki');
 			$listtagihan = $conn->query($cektagihan) or die('witszz...query tagihan opo ki');
 
 			if (!$listtagihan) // jika query error
@@ -326,7 +275,6 @@ LIMIT 1;
 				);
 			} else {
 
-				// $kosong = mysql_num_rows($listtagihan);
 				$kosong = $listtagihan->num_rows;
 				if ($kosong <> 0) { //jika ada data 
 					$total = 0;
@@ -379,7 +327,7 @@ LIMIT 1;
 			$response = array(
 				'ERR' => '15',
 				'METHOD' => 'INQUIRY',
-				'DESCRIPTION' => 'Nomor Identitas Pembayaran tidak ditemukan di basis data Billing Provider',
+				'DESCRIPTION' => 'Nomor Identitas Pembayaran tidak ditemukan di basis data tagihan Provider',
 				'CUSTNAME' => '',
 				'DESCRIPTION2' => '',
 				'BILL' => '0', //+ 2000
@@ -394,206 +342,118 @@ LIMIT 1;
 
 }elseif (isset($METHOD) && $METHOD == 'PAYMENT' && isset($_GET['token'])) {
 
-	$VANO =  $decoded_array['VANO'];
-	$VANO10 = substr($VANO, 6, 15);
-	$TRXDATE =  $decoded_array['TRXDATE'];
-	$REFNO =  $decoded_array['REFNO'];
-	$CHANNELID =  $decoded_array['CHANNELID'];
-	$CCY =  $decoded_array['CCY'];
-	$BILL =  $decoded_array['BILL'];
-	$PAYMENT =  $decoded_array['PAYMENT'];
+    $VANO =  $decoded_array['VANO'];
+    $VANO10 = substr($VANO, 6, 15);
+    $TRXDATE =  $decoded_array['TRXDATE'];
+    $REFNO =  $decoded_array['REFNO'];
+    $CHANNELID =  $decoded_array['CHANNELID'];
+    $CCY =  $decoded_array['CCY'];
+    $BILL =  $decoded_array['BILL'];
+    $PAYMENT =  $decoded_array['PAYMENT'];
 
-	$TRXDATE = date_create($TRXDATE);
-	$TRXDATE = date_format($TRXDATE, "Y-m-d h:i:s");
+    $TRXDATE = date_create($TRXDATE);
+    $TRXDATE = date_format($TRXDATE, "Y-m-d");
 
-	if ($VANO == '' || $TRXDATE == '' || $REFNO == '' || $CHANNELID == '' || $PAYMENT == 0) {
-		$response = array(
-			'ERR' => '30', //96
-			'METHOD' => 'PAYMENT',
-			'DESCRIPTION' => 'Salah format message',
-			'CUSTNAME' => '',
-			'DESCRIPTION2' => '',
-			'BILL' => '0', //+ 2000
-			'CCY' => '360'
-		);
-	} else {
-$cektagihanbuatinsert = "SELECT billing.billing_id, 
-       billing.billing_amount AS nominal, 
-       billing.username AS Nama, 
-       billing.phone_number AS NoPend,
-       billing.va_number AS NIM, 
-       billing.category AS NamaTagihan, 
-       billing.message, 
-       billing.zakat_id,
-       billing.campaign_id, 
-       billing.infak_id, 
-       billing.wakaf_id,
-       CASE 
-           WHEN billing.user_id IS NOT NULL THEN billing.user_id 
-           ELSE NULL 
-       END AS user_id
-FROM billing
-WHERE billing.va_number = '" . $conn->real_escape_string($VANO) . "' 
-  AND billing.success = 0
-GROUP BY billing.billing_id, 
-         billing.username, 
-         billing.phone_number, 
-         billing.va_number, 
-         billing.zakat_id, 
-         billing.campaign_id, 
-         billing.infak_id, 
-         billing.wakaf_id
-ORDER BY billing.billing_date DESC 
-LIMIT 1;
-";
+    if ($VANO == '' || $TRXDATE == '' || $REFNO == '' || $CHANNELID == '' || $PAYMENT == 0) {
+        $response = array(
+            'ERR' => '30',
+            'METHOD' => 'PAYMENT',
+            'DESCRIPTION' => 'Salah format message',
+            'CUSTNAME' => '',
+            'DESCRIPTION2' => '',
+            'BILL' => '0',
+            'CCY' => '360'
+        );
+    } else {
+        $cektagihanbuatinsert = "SELECT tagihan.tagihan_id,
+                                    tagihan.total_tagihan AS nominal,
+                                    users.nama AS Nama,
+                                    tagihan.va_number AS NIM,
+                                    qurban.tipe_qurban AS NamaTagihan,
+                                    tagihan.user_id,
+                                    tagihan.kartu_qurban_id,
+                                    tagihan.biaya_admin,
+                                    tagihan.jumlah_setoran,
+                                    tagihan.metode_pembayaran
+                                FROM tagihan
+                                JOIN users ON tagihan.user_id = users.user_id
+                                JOIN kartu_qurban ON tagihan.kartu_qurban_id = kartu_qurban.kartu_qurban_id
+                                JOIN qurban ON kartu_qurban.qurban_id = qurban.qurban_id
+                                WHERE tagihan.va_number = '" . $VANO . "'
+                                  AND tagihan.success = 0
+                                  AND tagihan.total_tagihan IS NOT NULL
+                                ORDER BY tagihan.tanggal_tagihan, tagihan.tagihan_id DESC
+                                LIMIT 1";
 
-$listtagihanbuatinsert = $conn->query($cektagihanbuatinsert) or die('Query error: ' . $conn->error);
+        $listtagihanbuatinsert = $conn->query($cektagihanbuatinsert) or die('Query error: ' . $conn->error);
 
-if ($listtagihanbuatinsert->num_rows > 0) { // Masukkan data yang sudah dicek
-    while ($row = $listtagihanbuatinsert->fetch_array()) {
-        // Penanganan user_id yang mungkin NULL
-        $user_id = !empty($row['user_id']) ? $row['user_id'] : 'NULL';
+        if ($listtagihanbuatinsert->num_rows > 0) {
+            while ($row = $listtagihanbuatinsert->fetch_array()) {
+                // Penanganan user_id yang mungkin NULL
+                $user_id = !empty($row['user_id']) ? $row['user_id'] : 'NULL';
 
-        $query = "INSERT INTO transaction (
-            user_id, transaction_amount, transaction_date, ref_no, channel, va_number, method, success, message, 
-            category, zakat_id, campaign_id, infak_id, wakaf_id, username, phone_number
-        ) VALUES (
-            $user_id,
-            " . $PAYMENT . ",
-            '" . $conn->real_escape_string($TRXDATE) . "',
-            '" . $conn->real_escape_string($REFNO) . "',
-            'ONLINE',
-            '" . $conn->real_escape_string($VANO) . "',
-            'VA NUMBER',
-            1,
-            '" . $conn->real_escape_string($row['message']) . "',
-            '" . $conn->real_escape_string($row['NamaTagihan']) . "',
-            " . (!empty($row['zakat_id']) ? $row['zakat_id'] : 'NULL') . ",
-            " . (!empty($row['campaign_id']) ? $row['campaign_id'] : 'NULL') . ",
-            " . (!empty($row['infak_id']) ? $row['infak_id'] : 'NULL') . ",
-            " . (!empty($row['wakaf_id']) ? $row['wakaf_id'] : 'NULL') . ",
-            '" . $conn->real_escape_string($row['Nama']) . "',
-            '" . $conn->real_escape_string($row['NoPend']) . "'
-        )";
-        
-        $insertResult = $conn->query($query);
-        
-        if (!$insertResult) {
-            echo "Error inserting transaction: " . $conn->error;
-        } else {
-            // Update tabel campaign/zakat/infak/wakaf setelah insert berhasil
-            if (!empty($row['campaign_id'])) {
-                // Mengambil campaign_code berdasarkan campaign_id
-                $getCodeQuery = "SELECT campaign_code FROM campaign WHERE campaign_id = " . $row['campaign_id'];
-                $codeResult = $conn->query($getCodeQuery);
-                if ($codeResult && $codeRow = $codeResult->fetch_assoc()) {
-                    $updateProcedure = "CALL lazismu.update_campaign_current_amount('" . $codeRow['campaign_code'] . "', " . $PAYMENT . ")";
-                }
-            } elseif (!empty($row['zakat_id'])) {
-                // Mengambil zakat_code berdasarkan zakat_id
-                $getCodeQuery = "SELECT zakat_code FROM zakat WHERE zakat_id = " . $row['zakat_id'];
-                $codeResult = $conn->query($getCodeQuery);
-                if ($codeResult && $codeRow = $codeResult->fetch_assoc()) {
-                    $updateProcedure = "CALL lazismu.update_zakat_amount('" . $codeRow['zakat_code'] . "', " . $PAYMENT . ")";
-                }
-            } elseif (!empty($row['infak_id'])) {
-                // Mengambil infak_code berdasarkan infak_id
-                $getCodeQuery = "SELECT infak_code FROM infak WHERE infak_id = " . $row['infak_id'];
-                $codeResult = $conn->query($getCodeQuery);
-                if ($codeResult && $codeRow = $codeResult->fetch_assoc()) {
-                    $updateProcedure = "CALL lazismu.update_infak_amount('" . $codeRow['infak_code'] . "', " . $PAYMENT . ")";
-                }
-            } elseif (!empty($row['wakaf_id'])) {
-                // Mengambil wakaf_code berdasarkan wakaf_id
-                $getCodeQuery = "SELECT wakaf_code FROM wakaf WHERE wakaf_id = " . $row['wakaf_id'];
-                $codeResult = $conn->query($getCodeQuery);
-                if ($codeResult && $codeRow = $codeResult->fetch_assoc()) {
-                    $updateProcedure = "CALL lazismu.update_wakaf_amount('" . $codeRow['wakaf_code'] . "', " . $PAYMENT . ")";
-                }
-            }
+                $query = "INSERT INTO transaksi (
+                    user_id, total_tagihan, tanggal_transaksi, ref_no, va_number, metode_pembayaran, 
+                    success, tagihan_id, biaya_admin, jumlah_setoran, kartu_qurban_id
+                ) VALUES (
+                    $user_id,
+                    " . $PAYMENT . ",
+                    '" . $conn->real_escape_string($TRXDATE) . "',
+                    '" . $conn->real_escape_string($REFNO) . "',
+                    '" . $conn->real_escape_string($VANO) . "',
+                    '" . $conn->real_escape_string($row['metode_pembayaran']) . "',
+                    1,
+                    '" . $conn->real_escape_string($row['tagihan_id']) . "',
+                    '" . $conn->real_escape_string($row['biaya_admin']) . "',
+                    '" . $conn->real_escape_string($row['jumlah_setoran']) . "',
+                    '" . $conn->real_escape_string($row['kartu_qurban_id']) . "'
+                )";
 
-            // Jalankan stored procedure untuk update jumlah
-            if (isset($updateProcedure)) {
-                $updateResult = $conn->query($updateProcedure);
+                $insertResult = $conn->query($query);
 
-                if (!$updateResult) {
-                    echo "Error updating amount: " . $conn->error;
-                }
-            }
-
-            // Update tabel billing setelah insert berhasil
-            $updateBilling = "UPDATE billing SET success = 1 WHERE va_number = '" . $VANO . "' AND success = 0 ORDER BY billing.billing_date DESC LIMIT 1";
-            $updateBillingResult = $conn->query($updateBilling);
-
-            if (!$updateBillingResult) {
-                echo "Error updating billing data: " . $conn->error;
-            } else {
-                // Mengirim pesan WhatsApp otomatis
-                $waApiUrl = "https://wa.srv11.wapanels.com/send-message";
-                $apiKey = "98057717bd2cec21101df07126a1681f8e31ef13";
-                $sender = "6283129363915";
-                $number = $row['NoPend'];
-                $message = "Terimakasih sudah berdonasi melalui platform Lazismu Kota Semarang";
-
-                $postData = [
-                    'api_key' => $apiKey,
-                    'sender' => $sender,
-                    'number' => $number,
-                    'message' => $message
-                ];
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $waApiUrl);
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                $output = curl_exec($ch);
-                $curlError = curl_error($ch);
-                curl_close($ch);
-
-                if ($output === false) {
-                    echo "Error sending WhatsApp message: " . $curlError;
+                if (!$insertResult) {
+                    echo "Error inserting transaction: " . $conn->error;
                 } else {
-                    $responseDecoded = json_decode($output, true);
-                    if ($responseDecoded && $responseDecoded['status'] == 'success') {
-                        // Success message or further processing
-                        $response = array(
-                            'ERR' => '00',
-                            'METHOD' => 'PAYMENT',
-                            'DESCRIPTION' => 'Top Up Payment Success',
-                            'CUSTNAME' => '',
-                            'DESCRIPTION2' => '',
-                            'BILL' => $PAYMENT,
-                            'CCY' => '360'
-                        );
-                    } else {
-                        echo "WhatsApp API responded with an error: " . $output;
+                    // Update kolom jumlah_terkumpul pada kartu_qurban
+                    $updateJumlahTerkumpul = "UPDATE kartu_qurban 
+                                              SET jumlah_terkumpul = jumlah_terkumpul + '" . $conn->real_escape_string($row['jumlah_setoran']) . "' 
+                                              WHERE kartu_qurban_id = '" . $conn->real_escape_string($row['kartu_qurban_id']) . "'";
+                    $updateResult = $conn->query($updateJumlahTerkumpul);
+
+                    if (!$updateResult) {
+                        echo "Error updating jumlah_terkumpul: " . $conn->error;
+                    }
+
+                    // Update tabel tagihan
+                    $updatetagihan = "UPDATE tagihan 
+                                      SET success = 1 
+                                      WHERE va_number = '" . $VANO . "' 
+                                        AND success = 0 
+                                      ORDER BY tagihan.tanggal_tagihan, tagihan.tagihan_id DESC LIMIT 1";
+                    $updatetagihanResult = $conn->query($updatetagihan);
+
+                    if (!$updatetagihanResult) {
+                        echo "Error updating tagihan data: " . $conn->error;
                     }
                 }
             }
+        } else {
+            $response = array(
+                'ERR' => '31',
+                'METHOD' => 'PAYMENT',
+                'DESCRIPTION' => 'No pending tagihan found',
+                'CUSTNAME' => '',
+                'DESCRIPTION2' => '',
+                'BILL' => '0',
+                'CCY' => '360'
+            );
         }
     }
-}
- else {
-    $response = array(
-        'ERR' => '31',
-        'METHOD' => 'PAYMENT',
-        'DESCRIPTION' => 'No pending billing found',
-        'CUSTNAME' => '',
-        'DESCRIPTION2' => '',
-        'BILL' => '0',
-        'CCY' => '360'
-    );
+
+    $jwt = JWT::encode($response, $key);
+    echo $jwt;
 }
 
-	
-
-	$jwt = JWT::encode($response, $key);
-	echo $jwt;
-	//echo $query;
-	//echo json_encode($response);
-}
-}
 
 elseif (isset($METHOD) && $METHOD == 'REVERSAL' && isset($_GET['token'])) {
 
@@ -626,11 +486,11 @@ elseif (isset($METHOD) && $METHOD == 'REVERSAL' && isset($_GET['token'])) {
 	} else {
 
 		// $query = "CALL BankRevesal ('" . $VANO . "','" . $REFNO . "','" . $TRXDATE . "','" . $CHANNELID . "','" . $PYMTDATE . "'," . $PAYMENT . ") ";
-		$query = "UPDATE transaction SET success = 0
+		$query = "UPDATE transaksi SET success = 0
     WHERE va_number = '" . $VANO . "'
     AND ref_no = '" . $REFNO . "'
-    AND transaction_date = '" . $PYMTDATE . "'
-    AND transaction_amount = " . $PAYMENT;
+    AND tanggal_transaksi = '" . $PYMTDATE . "'
+    AND total_tagihan = " . $PAYMENT;
 
 		/*
 			$cekid = "Select id from mst_personal WHERE LPAD(NoInduk, 10, 0)='".$VANO10."' or LPAD(NoLain, 10, 0)='".$VANO10."'";
