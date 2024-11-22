@@ -477,6 +477,14 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 
 elseif (isset($METHOD) && $METHOD == 'REVERSAL' && isset($_GET['token'])) {
 
+	$token = $_GET['token'];
+    $stmt = $conn->prepare("INSERT INTO logs (token, created_at) VALUES (?, NOW())");
+    $stmt->bind_param("s", $token); // "s" denotes a string parameter
+    if (!$stmt->execute()) {
+        // Handle error if token insertion fails
+        error_log("Failed to log token: " . $stmt->error);
+    }
+
 	$VANO =  $decoded_array['VANO'];
 	$VANO10 = substr($VANO, 6, 15);
 	$TRXDATE =  $decoded_array['TRXDATE'];
