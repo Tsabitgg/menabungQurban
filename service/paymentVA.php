@@ -195,8 +195,6 @@ $decoded = $transaksi->decode($_GET['token'], $key, array('HS256'));
 $decoded_array = (array) $decoded;
 
 $METHOD =  $decoded_array['METHOD'];
-$USERNAME =  $decoded_array['USERNAME'];
-$PASSWORD =  $decoded_array['PASSWORD'];
 
 if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 	$VANO =  $decoded_array['VANO'];
