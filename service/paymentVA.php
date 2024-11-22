@@ -433,30 +433,29 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
                     if (!$updatetagihanResult) {
                         echo "Error updating tagihan data: " . $conn->error;
                     } 
-					if ($insertResult && $updateResult && $updatetagihanResult) {
-						$response = array(
-							'ERR' => '00',
-							'METHOD' => 'PAYMENT',
-							'DESCRIPTION' => 'Top Up Payment Success',
-							'CUSTNAME' => $row['Nama'],
-							'DESCRIPTION2' => $row['NamaTagihan'],
-							'BILL' => $PAYMENT,
-							'CCY' => '360'
-						);
-					} else {
-						$response = array(
-							'ERR' => '32',
-							'METHOD' => 'PAYMENT',
-							'DESCRIPTION' => 'Transaction or update failed',
-							'CUSTNAME' => '',
-							'DESCRIPTION2' => '',
-							'BILL' => '0',
-							'CCY' => '360'
-						);
-					}
-					
-
                 }
+				if ($insertResult && $updateResult && $updatetagihanResult) {
+					$response = array(
+						'ERR' => '00',
+						'METHOD' => 'PAYMENT',
+						'DESCRIPTION' => 'Top Up Payment Success',
+						'CUSTNAME' => $row['Nama'],
+						'DESCRIPTION2' => $row['NamaTagihan'],
+						'BILL' => $PAYMENT,
+						'CCY' => '360'
+					);
+				} else {
+					$response = array(
+						'ERR' => '32',
+						'METHOD' => 'PAYMENT',
+						'DESCRIPTION' => 'Transaction or update failed',
+						'CUSTNAME' => '',
+						'DESCRIPTION2' => '',
+						'BILL' => '0',
+						'CCY' => '360'
+					);
+				}
+
             }
         } else {
             $response = array(
