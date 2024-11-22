@@ -340,6 +340,16 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 
 }elseif (isset($METHOD) && $METHOD == 'PAYMENT' && isset($_GET['token'])) {
 
+    $response = array(
+        'ERR' => '99', // Default error code
+        'METHOD' => 'PAYMENT',
+        'DESCRIPTION' => 'Undefined error occurred',
+        'CUSTNAME' => '',
+        'DESCRIPTION2' => '',
+        'BILL' => '0',
+        'CCY' => '360'
+    );
+
     $VANO =  $decoded_array['VANO'];
     $VANO10 = substr($VANO, 6, 15);
     $TRXDATE =  $decoded_array['TRXDATE'];
@@ -387,7 +397,6 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 
         if ($listtagihanbuatinsert->num_rows > 0) {
             while ($row = $listtagihanbuatinsert->fetch_array()) {
-                // Penanganan user_id yang mungkin NULL
                 $user_id = !empty($row['user_id']) ? $row['user_id'] : 'NULL';
 
                 $query = "INSERT INTO transaksi (
@@ -409,30 +418,18 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
 
                 $insertResult = $conn->query($query);
 
-                if (!$insertResult) {
-                    echo "Error inserting transaction: " . $conn->error;
-                } else {
-                    // Update kolom jumlah_terkumpul pada kartu_qurban
+                if ($insertResult) {
                     $updateJumlahTerkumpul = "UPDATE kartu_qurban 
                                               SET jumlah_terkumpul = jumlah_terkumpul + '" . $conn->real_escape_string($row['jumlah_setoran']) . "' 
                                               WHERE kartu_qurban_id = '" . $conn->real_escape_string($row['kartu_qurban_id']) . "'";
-                    $updateResult = $conn->query($updateJumlahTerkumpul);
+                    $conn->query($updateJumlahTerkumpul);
 
-                    if (!$updateResult) {
-                        echo "Error updating jumlah_terkumpul: " . $conn->error;
-                    }
-
-                    // Update tabel tagihan
                     $updatetagihan = "UPDATE tagihan 
                                       SET success = 1 
                                       WHERE va_number = '" . $VANO . "' 
                                         AND success = 0 
                                       ORDER BY tagihan.tanggal_tagihan, tagihan.tagihan_id DESC LIMIT 1";
-                    $updatetagihanResult = $conn->query($updatetagihan);
-
-                    if (!$updatetagihanResult) {
-                        echo "Error updating tagihan data: " . $conn->error;
-                    }
+                    $conn->query($updatetagihan);
                 }
             }
         } else {
@@ -451,6 +448,7 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
     $jwt = JWT::encode($response, $key);
     echo $jwt;
 }
+
 
 
 elseif (isset($METHOD) && $METHOD == 'REVERSAL' && isset($_GET['token'])) {
