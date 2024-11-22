@@ -422,12 +422,11 @@ if (isset($METHOD) && $METHOD == 'INQUIRY' && isset($_GET['token'])) {
                         echo "Error updating jumlah_terkumpul: " . $conn->error;
                     }
 
-                    // Update tabel tagihan
                     $updatetagihan = "UPDATE tagihan 
                                       SET success = 1 
                                       WHERE va_number = '" . $VANO . "' 
                                         AND success = 0 
-                                      ORDER BY tagihan.tanggal_tagihan, tagihan.tagihan_id DESC LIMIT 1";
+                                      ORDER BY tagihan.tagihan_id DESC LIMIT 1";
                     $updatetagihanResult = $conn->query($updatetagihan);
 
                     if (!$updatetagihanResult) {
@@ -479,9 +478,8 @@ elseif (isset($METHOD) && $METHOD == 'REVERSAL' && isset($_GET['token'])) {
 
 	$token = $_GET['token'];
     $stmt = $conn->prepare("INSERT INTO logs (token, created_at) VALUES (?, NOW())");
-    $stmt->bind_param("s", $token); // "s" denotes a string parameter
+    $stmt->bind_param("s", $token);
     if (!$stmt->execute()) {
-        // Handle error if token insertion fails
         error_log("Failed to log token: " . $stmt->error);
     }
 
