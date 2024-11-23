@@ -11,8 +11,8 @@ if (!isset($_SESSION['user'])) {
 $kartuQurban = getKartuQurban($conn);
 $qurbanProgress = getQurbanProgress($conn);
 $transaksiData = getTransaksi($conn);
-$last_transaksi = getLastTransaksiDaging($conn);
-$last_sedekah = getSedekahDaging($conn);
+$LastTransaksiDaging = getLastTransaksiDaging($conn);
+$sedekahDaging = getSedekahDaging($conn);
 
 $user = getLoggedInUser($conn);
 $tabunganData = getTabunganAndTarget($conn);
@@ -109,6 +109,14 @@ $tabunganData = getTabunganAndTarget($conn);
         </div>
     <?php endif; ?>
 
+    <?php if (isset($_SESSION['message'])) { ?>
+    <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
+    <?php unset($_SESSION['message']); ?>
+<?php } elseif (isset($_SESSION['error'])) { ?>
+    <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
+    <?php unset($_SESSION['error']); ?>
+<?php } ?>
+
     <!-- Layout wrapper -->
     <div class="layout-wrapper layout-content-navbar layout-without-menu">
       <div class="layout-container">
@@ -124,7 +132,10 @@ $tabunganData = getTabunganAndTarget($conn);
               <!-- Title -->
               <div class="navbar-nav align-items-center">
               <div class="nav-item d-flex align-items-center">
-                <h3 class="text-primary">DT Peduli - Tabungan Qurban</h3>
+                <h3 class="text-primary">
+                    <img src="../assets/img/favicon/dtpeduli.png" alt="DT Peduli Logo" style="height: 40px; vertical-align: middle;">
+                    Tabungan Qurban
+                </h3>
               </div>
               </div>
               <!-- /title -->
@@ -256,47 +267,52 @@ $tabunganData = getTabunganAndTarget($conn);
 <!-- Expense Overview -->
 <div class="col-md-6 col-lg-4 order-1 mb-4">
   <div class="card h-100">
+              <!-- Bagian Sedekah Terakhir -->
+              <div class="card-header d-flex align-items-center justify-content-between">
+          <h5 class="card-title m-0 me-2">Sedekah Daging</h5>
+          </div>
     <div class="card-body px-0">
       <div class="tab-content p-0">
         <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">
-          
-          <!-- Bagian Transaksi Terakhir -->
-          <div class="d-flex p-4 pt-3">
+
+                  <!-- Bagian Sedekah Daging -->
+                  <div class="d-flex p-4 pt-3">
             <div class="avatar flex-shrink-0 me-3">
               <img src="../assets/img/icons/unicons/wallet.png" alt="User" />
             </div>
             <div>
-              <small class="text-muted d-block">Transaksi Terakhir</small>
+              <small class="text-muted d-block">Total Sedekah Daging</small>
               <div class="d-flex align-items-center">
-                <?php if ($last_transaksi): ?>
-                  <h6 class="mb-0 me-1">Rp <?= number_format($last_transaksi['jumlah_sedekah'], 0, ',', '.') ?></h6>
-                  <small class="text-success fw-semibold">
-                    <i class="bx bx-chevron-up"></i>
-                    <?= date('d F Y', strtotime($last_transaksi['tanggal_sedekah'])) ?>
-                  </small>
-                <?php else: ?>
-                  <h6 class="mb-0 me-1">Belum ada transaksi</h6>
-                <?php endif; ?>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Bagian Sedekah Daging -->
-          <div class="d-flex p-4 pt-3">
-            <div class="avatar flex-shrink-0 me-3">
-              <img src="../assets/img/icons/unicons/wallet.png" alt="User" />
-            </div>
-            <div>
-              <small class="text-muted d-block">Sedekah Daging</small>
-              <div class="d-flex align-items-center">
-                <?php if ($last_sedekah > 0): ?>
-                  <h6 class="mb-0 me-1">Rp <?= number_format($last_sedekah, 0, ',', '.') ?></h6>
+                <?php if ($sedekahDaging > 0): ?>
+                  <h6 class="mb-0 me-1">Rp <?= number_format($sedekahDaging, 0, ',', '.') ?></h6>
                 <?php else: ?>
                   <h6 class="mb-0 me-1">Belum ada sedekah</h6>
                 <?php endif; ?>
               </div>
             </div>
           </div>
+        
+          <div class="d-flex p-4 pt-3">
+            <div class="avatar flex-shrink-0 me-3">
+              <img src="../assets/img/icons/unicons/wallet.png" alt="User" />
+            </div>
+            <div>
+              <small class="text-muted d-block">Sedekah Terakhir</small>
+              <div class="d-flex align-items-center">
+                <?php if ($LastTransaksiDaging): ?>
+                  <h6 class="mb-0 me-1">Rp <?= number_format($LastTransaksiDaging['jumlah_sedekah'], 0, ',', '.') ?></h6>
+                  <small class="text-success fw-semibold">
+                    <i class="bx bx-chevron-up"></i>
+                    <?= date('d F Y', strtotime($LastTransaksiDaging['tanggal_sedekah'])) ?>
+                  </small>
+                <?php else: ?>
+                  <h6 class="mb-0 me-1">Belum ada Sedekah</h6>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+          
+
           
         </div>
       </div>
@@ -314,7 +330,7 @@ $tabunganData = getTabunganAndTarget($conn);
                         <h5 class="m-0 me-2">Kartu Qurban</h5>
                         <!-- <small class="text-muted">4 Kartu </small> -->
                       </div>
-                      <div class="dropdown">
+                      <!-- <div class="dropdown">
                         <button
                           class="btn p-0"
                           type="button"
@@ -329,7 +345,7 @@ $tabunganData = getTabunganAndTarget($conn);
                           <a class="dropdown-item" href="javascript:void(0);">Tambah Qurban</a>
                           
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                     <div class="card-body">
                       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -373,7 +389,7 @@ $tabunganData = getTabunganAndTarget($conn);
                   <div class="card overflow-hidden mb-4" style="height: 470px">
                     <div class="card-header d-flex align-items-center justify-content-between">
                       <h5 class="card-title m-0 me-2">Transaksi</h5>
-                      <div class="dropdown">
+                      <!-- <div class="dropdown">
                         <button
                           class="btn p-0"
                           type="button"
@@ -389,7 +405,7 @@ $tabunganData = getTabunganAndTarget($conn);
                           <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
                           <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                     <div class="card-body" id="vertical-example">
 					<p>
@@ -470,13 +486,19 @@ $tabunganData = getTabunganAndTarget($conn);
                                             Terkumpul: Rp<?= number_format($qurban['jumlah_terkumpul'], 0, ',', '.') ?>
                                         </small>
                                     </div>
+                                    <small class="text-muted"><?php echo $qurban['nama_pengqurban']; ?></small>
                                     <div class="progress">
                                         <div class="progress-bar bg-success" role="progressbar" style="width: <?= $qurban['progress'] ?>%" aria-valuenow="<?= $qurban['progress'] ?>" aria-valuemin="0" aria-valuemax="100">
                                             <?= round($qurban['progress']) ?>%
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalSetor<?= $qurban['kartu_qurban_id'] ?>">Setor</button>
+                                <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalSetor<?= $qurban['kartu_qurban_id'] ?>">Setor</button>
+                        <?php if ($qurban['progress'] == 0) { ?>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalHapus<?= $qurban['kartu_qurban_id'] ?>">Hapus</button>
+                        <?php } ?>
+                    </div>
 
 <!-- Modal Setoran -->
 <div class="modal fade" id="modalSetor<?= $qurban['kartu_qurban_id'] ?>" tabindex="-1" aria-hidden="true">
@@ -500,6 +522,26 @@ $tabunganData = getTabunganAndTarget($conn);
     </div>
 </div>
 <!-- End Modal Setoran -->
+
+            <!-- Modal Konfirmasi Hapus -->
+            <div class="modal fade" id="modalHapus<?= $qurban['kartu_qurban_id'] ?>" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalHapusLabel">Konfirmasi Hapus</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Apakah Anda yakin ingin menghapus kartu qurban <strong><?= htmlspecialchars($qurban['tipe_qurban']) ?></strong>?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <a href="../service/prosesHapusKartuQurban.php?kartu_qurban_id=<?= $qurban['kartu_qurban_id'] ?>" class="btn btn-danger">Hapus</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Modal Konfirmasi Hapus -->
 
 
 <!-- Modal Pilihan Metode Pembayaran -->
