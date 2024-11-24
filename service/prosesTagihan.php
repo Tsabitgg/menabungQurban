@@ -3,7 +3,9 @@ include 'data.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kartu_qurban_id = $_POST['kartu_qurban_id'];
-    $jumlah_setoran = $_POST['jumlah_setoran'];
+
+    $jumlah_setoran = str_replace('.', '', $_POST['jumlah_setoran']); // Hapus format titik
+    $jumlah_setoran = intval($jumlah_setoran); // Ubah ke integer
     $metode_pembayaran = $_POST['metode_pembayaran'];
 
         // Hitung biaya admin berdasarkan jumlah setoran

@@ -443,28 +443,27 @@ $tabunganData = getTabunganAndTarget($conn);
                     <div class="card-body px-0">
                       <div class="tab-content p-0">
                         <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">
-                          <div class="d-flex p-4 pt-3">
-                            <div class="avatar flex-shrink-0 me-3">
-                              <img src="../assets/img/icons/unicons/wallet.png" alt="User" />
-                            </div>
-                            <?php
-                            if ($user) {
-                                $saldo = $user['saldo'];
-                                // $persentase = $user['persentase'];
-                            ?>
-                                <div>
-                                    <small class="text-muted d-block">Total Saldo</small>
-                                    <div class="d-flex align-items-center">
-                                        <h6 class="mb-0 me-1">Rp <?= number_format($saldo, 0, ',', '.') ?></h6>
-                                    </div>
-                                </div>
-                            <?php
-                            } else {
-                                echo "Data saldo tidak tersedia.";
-                            }
-                            ?>
+<div class="d-flex p-4 pt-3">
+    <div class="avatar flex-shrink-0 me-3">
+        <img src="../assets/img/icons/unicons/wallet.png" alt="User" />
+    </div>
+    <?php if ($user) {
+        $saldo = $user['saldo'];
+    ?>
+        <div>
+            <small class="text-muted d-block">Total Saldo</small>
+            <div class="d-flex align-items-center">
+                <h6 class="mb-0 me-1">Rp <?= number_format($saldo, 0, ',', '.') ?></h6>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#modalSetorSaldo">
+            Setor Saldo
+        </button>
+    <?php } else {
+        echo "Data saldo tidak tersedia.";
+    } ?>
+</div>
 
-                          </div>
                           
                     <div class="card-body">
                <?php       
@@ -511,10 +510,13 @@ $tabunganData = getTabunganAndTarget($conn);
             <div class="modal-body">
                 <form id="setorForm<?= $qurban['kartu_qurban_id'] ?>">
                     <input type="hidden" name="kartu_qurban_id" value="<?= $qurban['kartu_qurban_id'] ?>">
-                    <div class="mb-3">
-                        <label for="jumlahSetoran" class="form-label">Jumlah Setoran</label>
-                        <input type="number" class="form-control" name="jumlah_setoran" id="jumlahSetoran<?= $qurban['kartu_qurban_id'] ?>" placeholder="Masukkan jumlah setoran" required>
-                    </div>
+                      <div class="mb-3">
+                          <label for="jumlahSetoran" class="form-label">Jumlah Setoran</label>
+                          <div class="input-group">
+                              <span class="input-group-text">Rp</span>
+                              <input type="text" name="jumlah_setoran" id="jumlahSetoran<?= $qurban['kartu_qurban_id'] ?>" class="form-control format-rupiah" placeholder="Masukkan jumlah setoran" required>
+                          </div>
+                      </div>
                     <button type="button" class="btn btn-primary" onclick="openPaymentModal(<?= $qurban['kartu_qurban_id'] ?>)">Simpan Setoran</button>
                 </form>
             </div>
@@ -673,6 +675,49 @@ $tabunganData = getTabunganAndTarget($conn);
     </div>
 </div>
 
+<!-- Modal Setoran Alokasi dari Saldo -->
+<div class="modal fade" id="modalSetorSaldo" tabindex="-1" aria-labelledby="modalSetorSaldoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSetorSaldoLabel">Setor Saldo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="../service/prosesSetorSaldo.php" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="pilihanAlokasi" class="form-label">Pilih Alokasi</label>
+                        <select name="alokasi" id="pilihanAlokasi" class="form-select" required>
+                            <?php
+                            foreach ($qurbanProgress as $qurban) {
+                                if ($qurban['progress'] < 100) {
+                                    echo '<option value="qurban_' . $qurban['kartu_qurban_id'] . '">Kartu Qurban ' . htmlspecialchars($qurban['nama_pengqurban']) . ' - ' . htmlspecialchars($qurban['tipe_qurban']) . ' (Progress: ' . round($qurban['progress']) . '%)</option>';
+                                }
+                            }
+                            ?>
+                            <option value="sedekah_daging">Sedekah Daging</option>
+                        </select>
+                    </div>
+<div class="mb-3">
+    <label for="nominalSetor" class="form-label">Masukkan Nominal</label>
+    <div class="input-group">
+        <span class="input-group-text">Rp</span>
+        <input type="text" name="nominal" id="nominalSetor" class="form-control format-rupiah" placeholder="Masukkan nominal" required>
+    </div>
+    <small class="text-muted">Saldo saat ini: Rp <?= number_format($saldo, 0, ',', '.') ?></small>
+</div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 
                             </div>
@@ -792,6 +837,23 @@ $tabunganData = getTabunganAndTarget($conn);
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script>
+    // Tambahkan event listener ke semua elemen dengan kelas "format-rupiah"
+    document.querySelectorAll('.format-rupiah').forEach(function (input) {
+        input.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, ''); // Hapus karakter non-angka
+            e.target.value = formatRupiah(value);
+        });
+    });
+
+    // Fungsi format angka menjadi format rupiah
+    function formatRupiah(angka) {
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+</script>
+
+
 
     <!-- css -->
     <style>
