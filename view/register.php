@@ -164,6 +164,25 @@ if (isset($_SESSION['status']) && isset($_SESSION['message'])) {
      </form>
     </div>
    </div>
+   
+<!-- Footer -->
+<footer class="content-footer footer bg-footer-theme">
+  <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+    <div class="mb-2 mb-md-0">
+      ©
+      <script>
+        document.write(new Date().getFullYear());
+      </script>
+      , DT Peduli
+    </div>
+    <div>
+      <span>Powered by: <strong>PT. Inovasi Cipta Teknologi</strong></span>
+      <span class="mx-2">|</span>
+      <span>Support by: <strong>Bank Muamalat Indonesia</strong></span>
+    </div>
+  </div>
+</footer>
+<!-- / Footer -->
   </div>
  </body>
 </html>
