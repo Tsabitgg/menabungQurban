@@ -1,7 +1,7 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "Smartpay1ct";
+$host = "103.23.103.43";
+$user = "elpe";
+$pass = "Bismillah99";
 $database = "menabung_qurban";
 
 $conn = new mysqli($host, $user, $pass, $database);
