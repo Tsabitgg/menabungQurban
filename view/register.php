@@ -7,26 +7,9 @@ $qurbanDataMob = getAllQurban($conn);
 <html>
 
 <head>
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script>
-    function toggleSubmitButton(checkbox) {
-      document.getElementById("submitBtn").disabled = !checkbox.checked;
-    }
-
-    function showToast(type, message) {
-      Toastify({
-        text: message,
-        duration: 3000,
-        close: true,
-        gravity: "top",
-        position: "center",
-        backgroundColor: type === 'success' ? "#4CAF50" : "#F44336",
-      }).showToast();
-    }
-  </script>
 </head>
 
 <body class="md:bg-gray-100 md:p-8">
@@ -149,7 +132,7 @@ $qurbanDataMob = getAllQurban($conn);
           <!-- Checkbox untuk syarat dan ketentuan -->
           <div class="mb-4">
             <input type="checkbox" id="termsCheckbox" onchange="toggleSubmitButton(this)" />
-            <label for="termsCheckbox" class="text-white-700">Saya menyetujui syarat dan ketentuan yang berlaku.</label>
+            <label for="termsCheckbox" class="text-black-700">Saya menyetujui syarat dan ketentuan yang berlaku.</label>
           </div>
 
           <div class="text-center">
@@ -225,7 +208,7 @@ $qurbanDataMob = getAllQurban($conn);
               ?>
                   <div>
                     <input class="mr-2" id="qurban-<?php echo $row['qurban_id']; ?>" type="radio" name="qurban_id" value="<?php echo $row['qurban_id']; ?>" required />
-                    <label class="text-gray-700" for="qurban-<?php echo $row['qurban_id']; ?>">
+                    <label class="text-gray-700" style="font-size: 14px;" for="qurban-<?php echo $row['qurban_id']; ?>">
                       <?php echo $row['tipe_qurban']; ?> Rp. <?php echo number_format($row['biaya'], 0, ',', '.'); ?> <b>(<?php echo $row['jenis']; ?>)</b>
                     </label>
                   </div>
@@ -250,7 +233,6 @@ $qurbanDataMob = getAllQurban($conn);
               pattern="^(\\+62|62|08)[0-9]{8,}$"
               title="Format Nomor Handphone Tidak Valid!" />
           </div>
-        </form>
         <div class="w-11/12 mx-4">
           <img alt="Tabungan Qurban banner3" class="mb-3" src="../assets/img/illustrations/banner-main3.jpg" />
           <p class="text-gray-700 mb-4 text-center">
@@ -270,7 +252,7 @@ $qurbanDataMob = getAllQurban($conn);
       </div>
       <div class="w-full bg-white rounded-tr-[30px] h-96 rounded-tl-[30px] mt-16">
         <div class="w-ful flex items-center justify-center">
-          <div class="w-6/12 bg-yellow-500 text-white rounded-md shadow-md flex items-center justify-center -mt-4">
+          <div class="w-8/12 bg-yellow-500 text-white rounded-md shadow-md flex items-center justify-center -mt-4">
             <p class="font-bold py-2 px-4 text-lg">Syarat dan Ketentuan *</p>
           </div>
         </div>
@@ -292,31 +274,33 @@ $qurbanDataMob = getAllQurban($conn);
             <li class="pl-2">Penabung dihimbau untuk melakukan transaksi maksimal 2 kali dalam satu bulan.</li>
           </ol>
           <div class="bg-gray-300 p-4 rounded-lg shadow-inner shadow-md">
-            <h3 class="text-md font-semibold text-gray-800 mb-2">[ Pelaksanaan Qurban 1446 H / 2025 M ]</h3>
-            <p class="text-gray-700 text-sm">
+            <h3 class="text-sm font-semibold text-gray-800 mb-2">[ Pelaksanaan Qurban 1446 H / 2025 M ]</h3>
+            <p class="text-gray-700 text-xs">
               Iedul Qurban: 10 Dzulhijjah 1446H | 07 Juni 2025M<br>
               Hari Tasyrik: 11 - 13 Dzulhijjah 1446H | 08 Juni - 10 Juni 2025M
             </p>
           </div>
         </div>
-        <div class="text-center my-4">
-  <label class="flex justify-center items-center space-x-2 cursor-pointer">
-    <input type="checkbox" class="form-checkbox">
-    <span class="text-white text-sm">Saya menyetujui syarat dan ketentuan</span>
-  </label>
-</div>
 
+  <!-- Tambahkan checkbox untuk syarat dan ketentuan -->
+  <div class="mb-4 text-center">
+    <input type="checkbox" id="termsCheckbox" onchange="toggleSubmitButton(this)" />
+    <label for="termsCheckbox" class="text-black-700">Saya menyetujui syarat dan ketentuan yang berlaku.</label>
+  </div>
 
-        <div class="text-center my-4">
-          <button id="submitBtn" class="bg-orange-500 text-white px-6 py-2 rounded-md shadow-md cursor-pointer" type="submit" form="formPendaftaran" disabled>Mendaftar</button>
-        </div>
+  <!-- Tombol Submit dipindahkan ke dalam form -->
+  <div class="text-center">
+    <button id="submitBtn" class="bg-orange-500 text-white px-6 py-2 rounded" type="submit">Mendaftar</button>
+  </div>
+</form>
+
         <div class="text-center my-4">
           <div class="flex justify-center items-center space-x-2">
-            <p class="text-white text-sm">Sudah Memiliki Akun?</p>
+            <p class="text-black text-sm">Sudah Memiliki Akun?</p>
             <a href="login.php" class="text-blue-500 text-sm hover:underline cursor-pointer">Masuk Sekarang</a>
           </div>
         </div>
-        <footer class="bg-blue-800 text-white h-72 px-6 py-1">
+        <footer class="bg-blue-800 text-white h-80 px-6 py-1">
           <div class="mx-2 mt-4">
             <div class="mb-2 font-bold text-2xl">
               <span class="text-yellow-500">dt</span>peduli
@@ -332,11 +316,17 @@ $qurbanDataMob = getAllQurban($conn);
               </script>
               DT Peduli. All Rights Reserved
             </p>
+            <div class="text-xs">
+  <span>Powered by: <strong>PT. Inovasi Cipta Teknologi</strong></span>
+  <br />
+  <span>Support by: <strong>Bank Muamalat Indonesia</strong></span>
+</div>
+
 
           </div>
         </footer>
         
-        <div class="fixed bottom-0 left-0 w-full text-gray-600">
+        <div class="fixed bottom-0 left-0 w-full text-gray-600 text-sm">
           <!-- Wrapper -->
           <div class="relative grid h-24 w-full mx-auto grid-cols-2 gap-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
             <!-- Card 1 -->
@@ -378,6 +368,30 @@ $qurbanDataMob = getAllQurban($conn);
       </div>
     </div>
   </div>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+function toggleSubmitButton(checkbox) {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = !checkbox.checked;
+    console.log("Checkbox state:", checkbox.checked); // Log untuk memeriksa checkbox
+    console.log("Submit button state (disabled):", submitBtn.disabled); // Log untuk memeriksa tombol
+}
+
+
+
+    function showToast(type, message) {
+      Toastify({
+        text: message,
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "center",
+        backgroundColor: type === 'success' ? "#4CAF50" : "#F44336",
+      }).showToast();
+    }
+  </script>
 </body>
 
 </html>
