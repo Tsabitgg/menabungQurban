@@ -43,7 +43,7 @@ if ($result->num_rows > 0) {
         "transactionId" => strval($row['created_time']),
         "tipeTransaksi" => "MTR-GENERATE-QRIS-DYNAMIC",
         "vano" => strval($row['va_number'])
-    ];    
+    ];
 
     // Encode data menjadi token JWT
     $secretKey = 'TokenJWT_BMI_ICT';
