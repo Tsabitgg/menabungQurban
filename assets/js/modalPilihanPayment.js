@@ -103,8 +103,8 @@ function generateQris(createdTime) {
           const context = customCanvas.getContext("2d");
 
           // Ukuran canvas baru (menyesuaikan dengan ukuran QR code + tambahan teks)
-          const qrWidth = qrCanvas.width;
-          const qrHeight = qrCanvas.height;
+          const qrWidth = qrCanvas.width * 2; // Menambah resolusi QR code 2x
+          const qrHeight = qrCanvas.height * 2; // Menambah resolusi QR code 2x
           const padding = 20;
           const titleHeight = 40;
           const descriptionHeight = 60;
@@ -134,7 +134,7 @@ function generateQris(createdTime) {
             customCanvas.height - padding - descriptionHeight / 2
           );
 
-          // Gambar QR code di tengah
+          // Gambar QR code di tengah dengan ukuran yang lebih besar
           context.drawImage(
             qrCanvas,
             padding,
