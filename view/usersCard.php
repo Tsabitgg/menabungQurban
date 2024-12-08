@@ -568,18 +568,19 @@ $tabunganData = getTabunganAndTarget($conn);
                                 <!-- Tombol metode pembayaran QRIS dengan ikon -->
                                 <button type="button" class="btn btn-outline-primary payment-method-btn" id="qrisButton" onclick="selectPaymentMethod('qris')">
                                     <i class="bi bi-qr-code" style="font-size: 2rem;"></i><br>
-                                    QRIS
+                                    <span style="font-size: 0.875rem; font-weight: bold;">QRIS</span> <!-- Ukuran teks lebih kecil -->
                                 </button>
                             </div>
                             <div class="col-6">
                                 <!-- Tombol metode pembayaran Virtual Account dengan ikon -->
                                 <button type="button" class="btn btn-outline-primary payment-method-btn" id="vaButton" onclick="selectPaymentMethod('va')">
                                     <i class="bi bi-credit-card" style="font-size: 2rem;"></i><br>
-                                    Virtual Account
+                                    <span style="font-size: 0.875rem; font-weight: bold;">Virtual Account</span> <!-- Ukuran teks lebih kecil -->
                                 </button>
                             </div>
                         </div>
                     </div>
+
 
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-primary" id="btnBayarSekarang">Bayar Sekarang</button>
