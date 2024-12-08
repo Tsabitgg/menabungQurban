@@ -124,7 +124,7 @@ function generateQris(createdTime) {
           context.font = "bold 20px Arial";
           context.textAlign = "center";
           context.fillText(
-            "QRIS Tabungan Qurban",
+            "",
             customCanvas.width / 2,
             titleHeight * resolutionMultiplier
           );
@@ -132,7 +132,7 @@ function generateQris(createdTime) {
           // Tambahkan deskripsi
           context.font = "16px Arial";
           context.fillText(
-            "Gunakan e-Wallet atau M-Banking Anda",
+            "",
             customCanvas.width / 2,
             customCanvas.height -
               padding * resolutionMultiplier -
