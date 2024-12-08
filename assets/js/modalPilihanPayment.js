@@ -93,6 +93,7 @@ function generateQris(createdTime) {
       qrisModal.show();
 
       // Tambahkan fungsi download QR code
+      // Tambahkan fungsi download QR code
       document
         .getElementById("downloadQrBtn")
         .addEventListener("click", function () {
@@ -103,14 +104,16 @@ function generateQris(createdTime) {
           const context = customCanvas.getContext("2d");
 
           // Ukuran canvas baru (menyesuaikan dengan ukuran QR code + tambahan teks)
-          const qrWidth = qrCanvas.width * 2; // Menambah resolusi QR code 2x
-          const qrHeight = qrCanvas.height * 2; // Menambah resolusi QR code 2x
+          const qrWidth = qrCanvas.width;
+          const qrHeight = qrCanvas.height;
           const padding = 20;
           const titleHeight = 40;
           const descriptionHeight = 60;
-          customCanvas.width = qrWidth + padding * 2;
+          const resolutionMultiplier = 2; // Menggandakan resolusi untuk kualitas lebih tinggi
+          customCanvas.width = (qrWidth + padding * 2) * resolutionMultiplier;
           customCanvas.height =
-            qrHeight + titleHeight + descriptionHeight + padding * 2;
+            (qrHeight + titleHeight + descriptionHeight + padding * 2) *
+            resolutionMultiplier;
 
           // Latar belakang putih
           context.fillStyle = "#fff";
@@ -123,7 +126,7 @@ function generateQris(createdTime) {
           context.fillText(
             "QRIS Tabungan Qurban",
             customCanvas.width / 2,
-            titleHeight
+            titleHeight * resolutionMultiplier
           );
 
           // Tambahkan deskripsi
@@ -131,16 +134,18 @@ function generateQris(createdTime) {
           context.fillText(
             "Gunakan e-Wallet atau M-Banking Anda",
             customCanvas.width / 2,
-            customCanvas.height - padding - descriptionHeight / 2
+            customCanvas.height -
+              padding * resolutionMultiplier -
+              (descriptionHeight * resolutionMultiplier) / 2
           );
 
-          // Gambar QR code di tengah dengan ukuran yang lebih besar
+          // Gambar QR code di tengah
           context.drawImage(
             qrCanvas,
-            padding,
-            titleHeight + padding,
-            qrWidth,
-            qrHeight
+            padding * resolutionMultiplier,
+            titleHeight * resolutionMultiplier + padding * resolutionMultiplier,
+            qrWidth * resolutionMultiplier,
+            qrHeight * resolutionMultiplier
           );
 
           // Konversi canvas baru ke gambar
